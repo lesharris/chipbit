@@ -24,13 +24,13 @@ namespace Chipbit {
         m_CPU->sound_timer--;
     }
 
-    [[nodiscard]] std::vector<unsigned short> Framebuffer() const { return m_CPU->framebuffer; }
+    [[nodiscard]] std::vector<unsigned int> Framebuffer() const { return m_CPU->framebuffer; }
   private:
     struct CPU {
       CPU() {
         registers = std::vector<unsigned char>(16, 0);
         ram = std::vector<unsigned char>(4096, 0);
-        framebuffer = std::vector<unsigned short>(64 * 32, 0);
+        framebuffer = std::vector<unsigned int>(64 * 32, 0);
         keys = std::vector<unsigned char>(16, 0);
       }
 
@@ -52,7 +52,7 @@ namespace Chipbit {
       std::vector<unsigned char> registers;
       std::vector<unsigned char> keys;
       std::vector<unsigned char> ram;
-      std::vector<unsigned short> framebuffer;
+      std::vector<unsigned int> framebuffer;
 
       unsigned char sp = 0;
       unsigned short stack[16]{};
@@ -78,9 +78,14 @@ namespace Chipbit {
     void OpcodeD000(unsigned short operand);
     void OpcodeE000(unsigned short operand);
     void OpcodeF000(unsigned short operand);
+
+    static unsigned int Color(unsigned int r, unsigned int g, unsigned int b, unsigned int a);
   private:
     std::vector<unsigned char> m_Font;
     std::vector<std::function<void(unsigned short)>> m_Vectors;
     std::shared_ptr<CPU> m_CPU;
+
+    unsigned int m_OnColor = 0;
+    unsigned int m_OffColor = 0;
   };
 }

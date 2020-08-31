@@ -3,8 +3,6 @@
 #include <vector>
 
 #include "../core/Log.h"
-#include "../core/events/Events.h"
-#include "../core/EventManager.h"
 
 #define V(R)  m_CPU->registers[R]
 #define OPCODE(CODE) [this](unsigned short operand) { this->Opcode##CODE(operand); }
@@ -39,6 +37,11 @@ Chipbit::Chip8::Chip8() {
   };
 
   std::copy(m_Font.begin(), m_Font.end(), m_CPU->ram.begin());
+
+  m_OnColor = Color(255, 255, 255, 255);
+  m_OffColor = Color(33, 33, 33,255);
+
+  m_CPU->framebuffer = std::vector<unsigned int>(64 * 32, m_OffColor);
 }
 
 bool Chipbit::Chip8::Tick() {
@@ -74,7 +77,7 @@ bool Chipbit::Chip8::Tick() {
 void Chipbit::Chip8::Opcode0000(unsigned short operand) {
   switch(operand) {
     case 0x0E0:
-      m_CPU->framebuffer = std::vector<unsigned short>(64 * 32, 0);
+      m_CPU->framebuffer = std::vector<unsigned int>(64 * 32, m_OffColor);
       m_CPU->draw = true;
       break;
 
@@ -224,18 +227,20 @@ void Chipbit::Chip8::OpcodeD000(unsigned short operand) {
 
   V(0xF) = 0;
 
-  for(auto y = 0; y < height; y++) {
-    for(auto x = 0; x < 8; x++) {
-      unsigned char pixel = (m_CPU->ram[m_CPU->I + y] >> (7 - x)) & 0x01;
+  for(auto h = 0; h < height; h++) {
+    unsigned char sprite = m_CPU->ram[m_CPU->I + h];
 
-      int EX = (V(X) + x) % 64;
-      int EY = (V(Y) + y) % 32;
+    for(auto w = 0; w < 8; w++) {
+      if ((sprite & (0x80 >> w)) != 0) {
+        const int idx = (V(X) + w + ((V(Y) + h) * 64));
 
-      if((m_CPU->framebuffer[EY * 64 + EX] ^ pixel) == 0) {
-        V(0xF) = 1;
+        int curState = (m_CPU->framebuffer[idx] == m_OnColor);
+        if (curState == 1)
+          V(0xF) = 1;
+
+        const int result = (curState ^= 1);
+        m_CPU->framebuffer[idx] = (result) ? m_OnColor : m_OffColor;
       }
-
-      m_CPU->framebuffer[EY * 64 + EX] ^= pixel;
     }
   }
 
@@ -322,6 +327,10 @@ void Chipbit::Chip8::Load(const std::vector<unsigned char> &data, int address) {
   }
 
   std::copy(data.begin(), data.end(), m_CPU->ram.begin() + address);
+}
+
+unsigned int Chipbit::Chip8::Color(unsigned int r, unsigned int g, unsigned int b, unsigned int a) {
+  return r << 24 | g << 16 | b << 8 | a;
 }
 
 

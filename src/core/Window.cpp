@@ -37,6 +37,7 @@ Chipbit::Window::Window() {
     exit(EXIT_FAILURE);
   }
 
+  glfwSetWindowAspectRatio(m_Window, 2, 1);
   glfwMakeContextCurrent(m_Window);
   glfwSetFramebufferSizeCallback(m_Window, Window::ResizeFramebufferCallback);
   glfwSwapInterval(1);

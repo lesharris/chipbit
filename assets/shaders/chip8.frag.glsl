@@ -1,8 +1,9 @@
 #version 330 core
-out vec4 fragColor;
+in vec2 UV;
+out vec4 color;
+uniform sampler2D texSampler;
 
-// uniform vec4 color;
-
-void main(){
-    fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+void main()
+{
+    color = texture(texSampler, UV);
 }

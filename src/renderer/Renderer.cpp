@@ -3,83 +3,60 @@
 #include <iostream>
 #include <glad/glad.h>
 #include "../loaders/ShaderLoader.h"
-#include "../core/EventManager.h"
 
 Chipbit::Renderer::Renderer(const Chip8& cpu) {
   m_Shader = ShaderLoader::load(
       "assets/shaders/chip8.vert.glsl",
       "assets/shaders/chip8.frag.glsl");
 
-  GenVertices();
-  m_IndexCount = GenIndices(cpu.Framebuffer());
   glGenVertexArrays(1, &m_VAO);
   glGenBuffers(1, &m_VBO);
   glGenBuffers(1, &m_EBO);
 
   glBindVertexArray(m_VAO);
 
+  float vertices[] = {
+     -1.0,  1.0, 0.0f, 0.0f,
+      1.0,  1.0, 1.0f, 0.0f,
+      1.0, -1.0, 1.0f, 1.0f,
+     -1.0, -1.0, 0.0f, 1.0f
+  };
+
+  int indices[] = {
+      0, 1, 2,
+      2, 3, 0
+  };
+
   glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(m_Coords), m_Coords, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * m_IndexCount, m_Indices.data(), GL_DYNAMIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
   glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
 
-  EventManager::Get().Attach<
-      Events::ScreenUpdateEvent,
-      &Renderer::HandleScreenUpdate
-  >(this);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), reinterpret_cast<void*>((2 * sizeof(float))));
+
+  glGenTextures(1, &m_Texture);
+  glBindTexture(GL_TEXTURE_2D, m_Texture);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
 }
 
-void Chipbit::Renderer::GenVertices() {
-  for(auto y = 0; y < 33; y++)
-    for(auto x = 0; x < 65; x++) {
-      m_Coords[y * 130 + (x * 2)] = (-1.0f + x * 2.0f / 64.0f);
-      m_Coords[y * 130 + (x * 2) + 1] = (0.5f - y * 2.0f / 64.0f);
-    }
-}
-
-int Chipbit::Renderer::GenIndices(const std::vector<unsigned short>& framebuffer) {
-  m_Indices = std::vector<unsigned int>(64 * 32 * 6, 0);
-
-  auto index = 0;
-  for(auto y = 0; y < 32; y++)
-    for(auto x = 0; x < 64; x++) {
-      unsigned char byte = framebuffer[y * 64 + x];
-
-      if(byte == 1) {
-        m_Indices[index++] = 65 * y + x;
-        m_Indices[index++] = 65 * y + x + 1;
-        m_Indices[index++] = 65 * (y + 1) + x;
-
-        m_Indices[index++] = 65 * (y + 1) + x;
-        m_Indices[index++] = 65 * (y + 1) + x + 1;
-        m_Indices[index++] = 65 * y + x + 1;
-      }
-    }
-
-  return index;
-}
-
-void Chipbit::Renderer::Render(const std::vector<unsigned short>& fb) {
-  m_IndexCount = GenIndices(fb);
- /* if(m_UpdateIndices) {
-    m_UpdateIndices = false;
-    m_IndexCount = GenIndices(fb);
-  }*/
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * m_IndexCount, m_Indices.data(), GL_DYNAMIC_DRAW);
+void Chipbit::Renderer::Render(const std::vector<unsigned int>& fb) {
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 64, 32, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, fb.data());
 
   m_Shader->use();
+
   glBindVertexArray(m_VAO);
-
-  glDrawElements(GL_TRIANGLES, m_IndexCount, GL_UNSIGNED_INT, nullptr);
+  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
   glBindVertexArray(0);
-}
-
-void Chipbit::Renderer::HandleScreenUpdate(const Events::ScreenUpdateEvent &event) {
-  m_UpdateIndices = true;
 }

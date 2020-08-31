@@ -1,6 +1,5 @@
 #include "Chipbit.h"
 
-#include "core/Log.h"
 #include "loaders/RomLoader.h"
 
 void Chipbit::Chipbit::Initialize() {
@@ -11,11 +10,7 @@ void Chipbit::Chipbit::Initialize() {
 }
 
 void Chipbit::Chipbit::Run() {
-  int frames = 0;
-  int updates = 0;
-  double timer = glfwGetTime();
-
-  auto rom = RomLoader::load("assets/roms/INVADERS");
+  auto rom = RomLoader::load("assets/roms/c8_test.c8");
   m_CPU->Load(rom, 0x200);
 
   while(!m_Window->ShouldClose()) {
@@ -23,8 +18,9 @@ void Chipbit::Chipbit::Run() {
     m_DeltaTime += (time - m_LastFrameTime) / (1.0 / 60.0);
     m_LastFrameTime = time;
 
+    glfwPollEvents();
+
     {
-      glfwPollEvents();
       std::vector<unsigned char> keyBuf(16, 0);
       auto keys = m_Input->poll();
       m_CPU->ResetKeys();
@@ -38,7 +34,6 @@ void Chipbit::Chipbit::Run() {
     while(m_DeltaTime >= 1.0) {
       m_CPU->TickTimers();
       m_DeltaTime--;
-      updates++;
     }
 
     m_CPU->Tick();
@@ -48,14 +43,6 @@ void Chipbit::Chipbit::Run() {
       m_Window->BeginFrame();
       m_Renderer->Render(m_CPU->Framebuffer());
       m_Window->EndFrame();
-    }
-
-    frames++;
-
-    if (glfwGetTime() - timer > 1.0) {
-      timer ++;
-      CB_INFO("FPS: {0} Updates: {1}", frames, updates);
-      updates = 0, frames = 0;
     }
   }
 }
