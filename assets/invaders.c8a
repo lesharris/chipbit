@@ -1,0 +1,1116 @@
+; Setting used by the chipper assembler
+option schip11
+option binary
+align off
+
+; Recursive Disassembly
+End of file
+0x0200	jp loc_0225
+0x0202	db #53	;GRAPHIC =  # #  ##	ASCII(S)
+0x0203	db #50	;GRAPHIC =  # #    	ASCII(P)
+0x0204	db #41	;GRAPHIC =  #     #	ASCII(A)
+0x0205	db #43	;GRAPHIC =  #    ##	ASCII(C)
+0x0206	db #45	;GRAPHIC =  #   # #	ASCII(E)
+0x0207	db #20	;GRAPHIC =   #     
+0x0208	db #49	;GRAPHIC =  #  #  #	ASCII(I)
+0x0209	db #4e	;GRAPHIC =  #  ### 	ASCII(N)
+0x020a	db #56	;GRAPHIC =  # # ## 	ASCII(V)
+0x020b	db #41	;GRAPHIC =  #     #	ASCII(A)
+0x020c	db #44	;GRAPHIC =  #   #  	ASCII(D)
+0x020d	db #45	;GRAPHIC =  #   # #	ASCII(E)
+0x020e	db #52	;GRAPHIC =  # #  # 	ASCII(R)
+0x020f	db #53	;GRAPHIC =  # #  ##	ASCII(S)
+0x0210	db #20	;GRAPHIC =   #     
+0x0211	db #76	;GRAPHIC =  ### ## 	ASCII(v)
+0x0212	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x0213	db #2e	;GRAPHIC =   # ### 	ASCII(.)
+0x0214	db #39	;GRAPHIC =   ###  #	ASCII(9)
+0x0215	db #20	;GRAPHIC =   #     
+0x0216	db #42	;GRAPHIC =  #    # 	ASCII(B)
+0x0217	db #79	;GRAPHIC =  ####  #	ASCII(y)
+0x0218	db #20	;GRAPHIC =   #     
+0x0219	db #44	;GRAPHIC =  #   #  	ASCII(D)
+0x021a	db #61	;GRAPHIC =  ##    #	ASCII(a)
+0x021b	db #76	;GRAPHIC =  ### ## 	ASCII(v)
+0x021c	db #69	;GRAPHIC =  ## #  #	ASCII(i)
+0x021d	db #64	;GRAPHIC =  ##  #  	ASCII(d)
+0x021e	db #20	;GRAPHIC =   #     
+0x021f	db #57	;GRAPHIC =  # # ###	ASCII(W)
+0x0220	db #49	;GRAPHIC =  #  #  #	ASCII(I)
+0x0221	db #4e	;GRAPHIC =  #  ### 	ASCII(N)
+0x0222	db #54	;GRAPHIC =  # # #  	ASCII(T)
+0x0223	db #45	;GRAPHIC =  #   # #	ASCII(E)
+0x0224	db #52	;GRAPHIC =  # #  # 	ASCII(R)
+loc_0225:   ; == START OF CODE BLOCK ==
+0x0225	ld v0, #00
+0x0227	ld v1, #00
+0x0229	ld v2, #08
+0x022b	ld I, #03d3
+loc_022d:   ; == START OF CODE BLOCK ==
+0x022d	drw v0, v1, #8
+0x022f	add v1, #08
+0x0231	add I, v2
+0x0233	se v1, #20
+0x0235	jp loc_022d
+0x0237	add v0, #08
+0x0239	ld v1, #00
+0x023b	se v0, #40
+0x023d	jp loc_022d
+0x023f	ld v9, #05
+0x0241	ld vc, #15
+0x0243	ld ve, #00
+loc_0245:   ; == START OF CODE BLOCK ==
+0x0245	call loc_0387
+0x0247	ld v0, #0a
+0x0249	ld dt, v0
+loc_024b:   ; == START OF CODE BLOCK ==
+0x024b	ld v0, dt
+0x024d	se v0, #00
+0x024f	jp loc_024b
+0x0251	call loc_0387
+0x0253	add ve, #01
+0x0255	jp loc_0245
+loc_0257:   ; == START OF CODE BLOCK ==
+0x0257	ld v6, #00
+0x0259	ld v8, #1c
+0x025b	ld v9, #00
+0x025d	ld va, #04
+0x025f	ld vb, #0a
+0x0261	ld vc, #04
+0x0263	ld vd, #3c
+0x0265	ld ve, #0f
+0x0267	cls
+0x0269	call loc_036b
+0x026b	call loc_0347
+0x026d	ld dt, vd
+loc_026f:   ; == START OF CODE BLOCK ==
+0x026f	ld v0, #04
+0x0271	skp v0
+0x0273	jp loc_027d
+0x0275	call loc_036b
+0x0277	se v8, #00
+0x0279	add v8, #ff
+0x027b	call loc_036b
+loc_027d:   ; == START OF CODE BLOCK ==
+0x027d	ld v0, #06
+0x027f	skp v0
+0x0281	jp loc_028b
+0x0283	call loc_036b
+0x0285	se v8, #39
+0x0287	add v8, #01
+0x0289	call loc_036b
+loc_028b:   ; == START OF CODE BLOCK ==
+0x028b	se v6, #00
+0x028d	jp loc_029f
+0x028f	ld v0, #05
+0x0291	skp v0
+0x0293	jp loc_02e9
+0x0295	ld v6, #01
+0x0297	ld v5, #1b
+0x0299	ld v4, v8
+0x029b	ld I, #03cf
+0x029d	drw v4, v5, #1
+loc_029f:   ; == START OF CODE BLOCK ==
+0x029f	ld I, #03cf
+0x02a1	drw v4, v5, #1
+0x02a3	add v5, #ff
+0x02a5	se v5, #ff
+0x02a7	jp loc_02ad
+0x02a9	ld v6, #00
+0x02ab	jp loc_02e9
+loc_02ad:   ; == START OF CODE BLOCK ==
+0x02ad	drw v4, v5, #1
+0x02af	se vf, #01
+0x02b1	jp loc_02e9
+0x02b3	drw v4, v5, #1
+0x02b5	ld v6, #00
+0x02b7	ld v3, v4
+0x02b9	add v3, #03
+0x02bb	sub v3, vb
+0x02bd	ld v2, #f8
+0x02bf	and v3, v2
+0x02c1	ld v2, #08
+0x02c3	se v3, #00
+0x02c5	jp loc_02c9
+0x02c7	call loc_0373
+loc_02c9:   ; == START OF CODE BLOCK ==
+0x02c9	shr v2
+0x02cb	sne v3, #08
+0x02cd	jp loc_02d3
+0x02cf	se v3, #10
+0x02d1	jp loc_02d5
+loc_02d3:   ; == START OF CODE BLOCK ==
+0x02d3	call loc_0373
+loc_02d5:   ; == START OF CODE BLOCK ==
+0x02d5	shr v2
+0x02d7	se v3, #18
+0x02d9	jp loc_02dd
+0x02db	call loc_0373
+loc_02dd:   ; == START OF CODE BLOCK ==
+0x02dd	shr v2
+0x02df	sne v3, #20
+0x02e1	jp loc_02e7
+0x02e3	se v3, #28
+0x02e5	jp loc_02e9
+loc_02e7:   ; == START OF CODE BLOCK ==
+0x02e7	call loc_0373
+loc_02e9:   ; == START OF CODE BLOCK ==
+0x02e9	se ve, #00
+0x02eb	jp loc_0307
+0x02ed	add v9, #06
+0x02ef	sne v9, #18
+0x02f1	ld v9, #00
+0x02f3	ld va, #04
+0x02f5	ld vb, #0a
+0x02f7	ld vc, #04
+0x02f9	add vd, #f4
+0x02fb	ld ve, #0f
+0x02fd	cls
+0x02ff	call loc_0347
+0x0301	call loc_036b
+0x0303	ld dt, vd
+0x0305	jp loc_026f
+loc_0307:   ; == START OF CODE BLOCK ==
+0x0307	ld v7, dt
+0x0309	se v7, #00
+0x030b	jp loc_026f
+0x030d	ld dt, vd
+0x030f	call loc_0347
+0x0311	add vb, va
+0x0313	se vb, #12
+0x0315	jp loc_031b
+0x0317	add vc, #02
+0x0319	ld va, #fc
+loc_031b:   ; == START OF CODE BLOCK ==
+0x031b	se vb, #02
+0x031d	jp loc_0323
+0x031f	add vc, #02
+0x0321	ld va, #04
+loc_0323:   ; == START OF CODE BLOCK ==
+0x0323	call loc_0347
+0x0325	se vc, #18
+0x0327	jp loc_026f
+0x0329	cls
+0x032b	ld I, #04d3
+0x032d	ld v0, #14
+0x032f	ld v1, #08
+0x0331	ld v2, #0f
+loc_0333:   ; == START OF CODE BLOCK ==
+0x0333	drw v0, v1, #f
+0x0335	add v0, #08
+0x0337	add I, v2
+0x0339	se v0, #2c
+0x033b	jp loc_0333
+0x033d	ld v0, k
+0x033f	cls
+0x0341	ld I, #06f4
+0x0343	ld ve, [I]
+0x0345	jp loc_0225
+loc_0347:   ; == START OF CODE BLOCK ==
+0x0347	ld I, #03b7
+0x0349	add I, v9
+0x034b	ld v1, #08
+0x034d	call loc_035f
+0x034f	shr v1
+0x0351	call loc_035f
+0x0353	shr v1
+0x0355	call loc_035f
+0x0357	shr v1
+0x0359	call loc_035f
+0x035b	add vb, #d0
+0x035d	ret
+loc_035f:   ; == START OF CODE BLOCK ==
+0x035f	ld v0, ve
+0x0361	and v0, v1
+0x0363	se v0, #00
+0x0365	drw vb, vc, #6
+0x0367	add vb, #0c
+0x0369	ret
+loc_036b:   ; == START OF CODE BLOCK ==
+0x036b	ld I, #03cf
+0x036d	ld v0, #1c
+0x036f	drw v8, v0, #4
+0x0371	ret
+loc_0373:   ; == START OF CODE BLOCK ==
+0x0373	call loc_0347
+0x0375	xor ve, v2
+0x0377	call loc_0347
+0x0379	ld v0, #05
+0x037b	ld st, v0
+0x037d	ld dt, v0
+loc_037f:   ; == START OF CODE BLOCK ==
+0x037f	ld v0, dt
+0x0381	se v0, #00
+0x0383	jp loc_037f
+0x0385	ret
+loc_0387:   ; == START OF CODE BLOCK ==
+0x0387	ld va, #00
+0x0389	ld vd, ve
+0x038b	ld vb, #04
+loc_038d:   ; == START OF CODE BLOCK ==
+0x038d	sknp v9
+0x038f	jp loc_0257
+0x0391	ld I, #0602
+0x0393	add I, vd
+0x0395	ld v0, [I]
+0x0397	se v0, #ff
+0x0399	jp loc_03a5
+0x039b	ld va, #00
+0x039d	ld vb, #04
+0x039f	ld vd, #01
+0x03a1	ld ve, #01
+0x03a3	jp loc_038d
+loc_03a5:   ; == START OF CODE BLOCK ==
+0x03a5	ld I, #0500
+0x03a7	add I, v0
+0x03a9	drw vb, vc, #6
+0x03ab	add vb, #08
+0x03ad	add vd, #01
+0x03af	add va, #01
+0x03b1	se va, #07
+0x03b3	jp loc_038d
+0x03b5	ret
+0x03b7	db #3c	;GRAPHIC =   ####  	ASCII(<)
+0x03b8	db #7e	;GRAPHIC =  ###### 	ASCII(~)
+0x03b9	db #ff	;GRAPHIC = ########
+0x03ba	db #ff	;GRAPHIC = ########
+0x03bb	db #99	;GRAPHIC = #  ##  #
+0x03bc	db #99	;GRAPHIC = #  ##  #
+0x03bd	db #7e	;GRAPHIC =  ###### 	ASCII(~)
+0x03be	db #ff	;GRAPHIC = ########
+0x03bf	db #ff	;GRAPHIC = ########
+0x03c0	db #24	;GRAPHIC =   #  #  	ASCII($)
+0x03c1	db #24	;GRAPHIC =   #  #  	ASCII($)
+0x03c2	db #e7	;GRAPHIC = ###  ###
+0x03c3	db #7e	;GRAPHIC =  ###### 	ASCII(~)
+0x03c4	db #ff	;GRAPHIC = ########
+0x03c5	db #3c	;GRAPHIC =   ####  	ASCII(<)
+0x03c6	db #3c	;GRAPHIC =   ####  	ASCII(<)
+0x03c7	db #7e	;GRAPHIC =  ###### 	ASCII(~)
+0x03c8	db #db	;GRAPHIC = ## ## ##
+0x03c9	db #81	;GRAPHIC = #      #
+0x03ca	db #42	;GRAPHIC =  #    # 	ASCII(B)
+0x03cb	db #3c	;GRAPHIC =   ####  	ASCII(<)
+0x03cc	db #7e	;GRAPHIC =  ###### 	ASCII(~)
+0x03cd	db #ff	;GRAPHIC = ########
+0x03ce	db #db	;GRAPHIC = ## ## ##
+0x03cf	db #10	;GRAPHIC =    #    
+0x03d0	db #38	;GRAPHIC =   ###   	ASCII(8)
+0x03d1	db #7c	;GRAPHIC =  #####  	ASCII(|)
+0x03d2	db #fe	;GRAPHIC = ####### 
+0x03d3	db #00	;GRAPHIC =         
+0x03d4	db #00	;GRAPHIC =         
+0x03d5	db #7f	;GRAPHIC =  #######
+0x03d6	db #00	;GRAPHIC =         
+0x03d7	db #3f	;GRAPHIC =   ######	ASCII(?)
+0x03d8	db #00	;GRAPHIC =         
+0x03d9	db #7f	;GRAPHIC =  #######
+0x03da	db #00	;GRAPHIC =         
+0x03db	db #00	;GRAPHIC =         
+0x03dc	db #00	;GRAPHIC =         
+0x03dd	db #01	;GRAPHIC =        #
+0x03de	db #01	;GRAPHIC =        #
+0x03df	db #01	;GRAPHIC =        #
+0x03e0	db #03	;GRAPHIC =       ##
+0x03e1	db #03	;GRAPHIC =       ##
+0x03e2	db #03	;GRAPHIC =       ##
+0x03e3	db #03	;GRAPHIC =       ##
+0x03e4	db #00	;GRAPHIC =         
+0x03e5	db #00	;GRAPHIC =         
+0x03e6	db #3f	;GRAPHIC =   ######	ASCII(?)
+0x03e7	db #20	;GRAPHIC =   #     
+0x03e8	db #20	;GRAPHIC =   #     
+0x03e9	db #20	;GRAPHIC =   #     
+0x03ea	db #20	;GRAPHIC =   #     
+0x03eb	db #20	;GRAPHIC =   #     
+0x03ec	db #20	;GRAPHIC =   #     
+0x03ed	db #20	;GRAPHIC =   #     
+0x03ee	db #20	;GRAPHIC =   #     
+0x03ef	db #3f	;GRAPHIC =   ######	ASCII(?)
+0x03f0	db #08	;GRAPHIC =     #   
+0x03f1	db #08	;GRAPHIC =     #   
+0x03f2	db #ff	;GRAPHIC = ########
+0x03f3	db #00	;GRAPHIC =         
+0x03f4	db #00	;GRAPHIC =         
+0x03f5	db #fe	;GRAPHIC = ####### 
+0x03f6	db #00	;GRAPHIC =         
+0x03f7	db #fc	;GRAPHIC = ######  
+0x03f8	db #00	;GRAPHIC =         
+0x03f9	db #fe	;GRAPHIC = ####### 
+0x03fa	db #00	;GRAPHIC =         
+0x03fb	db #00	;GRAPHIC =         
+0x03fc	db #00	;GRAPHIC =         
+0x03fd	db #7e	;GRAPHIC =  ###### 	ASCII(~)
+0x03fe	db #42	;GRAPHIC =  #    # 	ASCII(B)
+0x03ff	db #42	;GRAPHIC =  #    # 	ASCII(B)
+0x0400	db #62	;GRAPHIC =  ##   # 	ASCII(b)
+0x0401	db #62	;GRAPHIC =  ##   # 	ASCII(b)
+0x0402	db #62	;GRAPHIC =  ##   # 	ASCII(b)
+0x0403	db #62	;GRAPHIC =  ##   # 	ASCII(b)
+0x0404	db #00	;GRAPHIC =         
+0x0405	db #00	;GRAPHIC =         
+0x0406	db #ff	;GRAPHIC = ########
+0x0407	db #00	;GRAPHIC =         
+0x0408	db #00	;GRAPHIC =         
+0x0409	db #00	;GRAPHIC =         
+0x040a	db #00	;GRAPHIC =         
+0x040b	db #00	;GRAPHIC =         
+0x040c	db #00	;GRAPHIC =         
+0x040d	db #00	;GRAPHIC =         
+0x040e	db #00	;GRAPHIC =         
+0x040f	db #ff	;GRAPHIC = ########
+0x0410	db #00	;GRAPHIC =         
+0x0411	db #00	;GRAPHIC =         
+0x0412	db #ff	;GRAPHIC = ########
+0x0413	db #00	;GRAPHIC =         
+0x0414	db #7d	;GRAPHIC =  ##### #	ASCII(})
+0x0415	db #00	;GRAPHIC =         
+0x0416	db #41	;GRAPHIC =  #     #	ASCII(A)
+0x0417	db #7d	;GRAPHIC =  ##### #	ASCII(})
+0x0418	db #05	;GRAPHIC =      # #
+0x0419	db #7d	;GRAPHIC =  ##### #	ASCII(})
+0x041a	db #7d	;GRAPHIC =  ##### #	ASCII(})
+0x041b	db #00	;GRAPHIC =         
+0x041c	db #00	;GRAPHIC =         
+0x041d	db #c2	;GRAPHIC = ##    # 
+0x041e	db #c2	;GRAPHIC = ##    # 
+0x041f	db #c6	;GRAPHIC = ##   ## 
+0x0420	db #44	;GRAPHIC =  #   #  	ASCII(D)
+0x0421	db #6c	;GRAPHIC =  ## ##  	ASCII(l)
+0x0422	db #28	;GRAPHIC =   # #   	ASCII(()
+0x0423	db #38	;GRAPHIC =   ###   	ASCII(8)
+0x0424	db #00	;GRAPHIC =         
+0x0425	db #00	;GRAPHIC =         
+0x0426	db #ff	;GRAPHIC = ########
+0x0427	db #00	;GRAPHIC =         
+0x0428	db #00	;GRAPHIC =         
+0x0429	db #00	;GRAPHIC =         
+0x042a	db #00	;GRAPHIC =         
+0x042b	db #00	;GRAPHIC =         
+0x042c	db #00	;GRAPHIC =         
+0x042d	db #00	;GRAPHIC =         
+0x042e	db #00	;GRAPHIC =         
+0x042f	db #ff	;GRAPHIC = ########
+0x0430	db #00	;GRAPHIC =         
+0x0431	db #00	;GRAPHIC =         
+0x0432	db #ff	;GRAPHIC = ########
+0x0433	db #00	;GRAPHIC =         
+0x0434	db #f7	;GRAPHIC = #### ###
+0x0435	db #10	;GRAPHIC =    #    
+0x0436	db #14	;GRAPHIC =    # #  
+0x0437	db #f7	;GRAPHIC = #### ###
+0x0438	db #f7	;GRAPHIC = #### ###
+0x0439	db #04	;GRAPHIC =      #  
+0x043a	db #04	;GRAPHIC =      #  
+0x043b	db #00	;GRAPHIC =         
+0x043c	db #00	;GRAPHIC =         
+0x043d	db #7c	;GRAPHIC =  #####  	ASCII(|)
+0x043e	db #44	;GRAPHIC =  #   #  	ASCII(D)
+0x043f	db #fe	;GRAPHIC = ####### 
+0x0440	db #c2	;GRAPHIC = ##    # 
+0x0441	db #c2	;GRAPHIC = ##    # 
+0x0442	db #c2	;GRAPHIC = ##    # 
+0x0443	db #c2	;GRAPHIC = ##    # 
+0x0444	db #00	;GRAPHIC =         
+0x0445	db #00	;GRAPHIC =         
+0x0446	db #ff	;GRAPHIC = ########
+0x0447	db #00	;GRAPHIC =         
+0x0448	db #00	;GRAPHIC =         
+0x0449	db #00	;GRAPHIC =         
+0x044a	db #00	;GRAPHIC =         
+0x044b	db #00	;GRAPHIC =         
+0x044c	db #00	;GRAPHIC =         
+0x044d	db #00	;GRAPHIC =         
+0x044e	db #00	;GRAPHIC =         
+0x044f	db #ff	;GRAPHIC = ########
+0x0450	db #00	;GRAPHIC =         
+0x0451	db #00	;GRAPHIC =         
+0x0452	db #ff	;GRAPHIC = ########
+0x0453	db #00	;GRAPHIC =         
+0x0454	db #ef	;GRAPHIC = ### ####
+0x0455	db #20	;GRAPHIC =   #     
+0x0456	db #28	;GRAPHIC =   # #   	ASCII(()
+0x0457	db #e8	;GRAPHIC = ### #   
+0x0458	db #e8	;GRAPHIC = ### #   
+0x0459	db #2f	;GRAPHIC =   # ####	ASCII(/)
+0x045a	db #2f	;GRAPHIC =   # ####	ASCII(/)
+0x045b	db #00	;GRAPHIC =         
+0x045c	db #00	;GRAPHIC =         
+0x045d	db #f9	;GRAPHIC = #####  #
+0x045e	db #85	;GRAPHIC = #    # #
+0x045f	db #c5	;GRAPHIC = ##   # #
+0x0460	db #c5	;GRAPHIC = ##   # #
+0x0461	db #c5	;GRAPHIC = ##   # #
+0x0462	db #c5	;GRAPHIC = ##   # #
+0x0463	db #f9	;GRAPHIC = #####  #
+0x0464	db #00	;GRAPHIC =         
+0x0465	db #00	;GRAPHIC =         
+0x0466	db #ff	;GRAPHIC = ########
+0x0467	db #00	;GRAPHIC =         
+0x0468	db #00	;GRAPHIC =         
+0x0469	db #00	;GRAPHIC =         
+0x046a	db #00	;GRAPHIC =         
+0x046b	db #00	;GRAPHIC =         
+0x046c	db #00	;GRAPHIC =         
+0x046d	db #00	;GRAPHIC =         
+0x046e	db #00	;GRAPHIC =         
+0x046f	db #ff	;GRAPHIC = ########
+0x0470	db #00	;GRAPHIC =         
+0x0471	db #00	;GRAPHIC =         
+0x0472	db #ff	;GRAPHIC = ########
+0x0473	db #00	;GRAPHIC =         
+0x0474	db #be	;GRAPHIC = # ##### 
+0x0475	db #00	;GRAPHIC =         
+0x0476	db #20	;GRAPHIC =   #     
+0x0477	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x0478	db #20	;GRAPHIC =   #     
+0x0479	db #be	;GRAPHIC = # ##### 
+0x047a	db #be	;GRAPHIC = # ##### 
+0x047b	db #00	;GRAPHIC =         
+0x047c	db #00	;GRAPHIC =         
+0x047d	db #f7	;GRAPHIC = #### ###
+0x047e	db #04	;GRAPHIC =      #  
+0x047f	db #e7	;GRAPHIC = ###  ###
+0x0480	db #85	;GRAPHIC = #    # #
+0x0481	db #85	;GRAPHIC = #    # #
+0x0482	db #84	;GRAPHIC = #    #  
+0x0483	db #f4	;GRAPHIC = #### #  
+0x0484	db #00	;GRAPHIC =         
+0x0485	db #00	;GRAPHIC =         
+0x0486	db #ff	;GRAPHIC = ########
+0x0487	db #00	;GRAPHIC =         
+0x0488	db #00	;GRAPHIC =         
+0x0489	db #00	;GRAPHIC =         
+0x048a	db #00	;GRAPHIC =         
+0x048b	db #00	;GRAPHIC =         
+0x048c	db #00	;GRAPHIC =         
+0x048d	db #00	;GRAPHIC =         
+0x048e	db #00	;GRAPHIC =         
+0x048f	db #ff	;GRAPHIC = ########
+0x0490	db #00	;GRAPHIC =         
+0x0491	db #00	;GRAPHIC =         
+0x0492	db #ff	;GRAPHIC = ########
+0x0493	db #00	;GRAPHIC =         
+0x0494	db #00	;GRAPHIC =         
+0x0495	db #7f	;GRAPHIC =  #######
+0x0496	db #00	;GRAPHIC =         
+0x0497	db #3f	;GRAPHIC =   ######	ASCII(?)
+0x0498	db #00	;GRAPHIC =         
+0x0499	db #7f	;GRAPHIC =  #######
+0x049a	db #00	;GRAPHIC =         
+0x049b	db #00	;GRAPHIC =         
+0x049c	db #00	;GRAPHIC =         
+0x049d	db #ef	;GRAPHIC = ### ####
+0x049e	db #28	;GRAPHIC =   # #   	ASCII(()
+0x049f	db #ef	;GRAPHIC = ### ####
+0x04a0	db #00	;GRAPHIC =         
+0x04a1	db #e0	;GRAPHIC = ###     
+0x04a2	db #60	;GRAPHIC =  ##     	ASCII(`)
+0x04a3	db #6f	;GRAPHIC =  ## ####	ASCII(o)
+0x04a4	db #00	;GRAPHIC =         
+0x04a5	db #00	;GRAPHIC =         
+0x04a6	db #ff	;GRAPHIC = ########
+0x04a7	db #00	;GRAPHIC =         
+0x04a8	db #00	;GRAPHIC =         
+0x04a9	db #00	;GRAPHIC =         
+0x04aa	db #00	;GRAPHIC =         
+0x04ab	db #00	;GRAPHIC =         
+0x04ac	db #00	;GRAPHIC =         
+0x04ad	db #00	;GRAPHIC =         
+0x04ae	db #00	;GRAPHIC =         
+0x04af	db #ff	;GRAPHIC = ########
+0x04b0	db #00	;GRAPHIC =         
+0x04b1	db #00	;GRAPHIC =         
+0x04b2	db #ff	;GRAPHIC = ########
+0x04b3	db #00	;GRAPHIC =         
+0x04b4	db #00	;GRAPHIC =         
+0x04b5	db #fe	;GRAPHIC = ####### 
+0x04b6	db #00	;GRAPHIC =         
+0x04b7	db #fc	;GRAPHIC = ######  
+0x04b8	db #00	;GRAPHIC =         
+0x04b9	db #fe	;GRAPHIC = ####### 
+0x04ba	db #00	;GRAPHIC =         
+0x04bb	db #00	;GRAPHIC =         
+0x04bc	db #00	;GRAPHIC =         
+0x04bd	db #c0	;GRAPHIC = ##      
+0x04be	db #00	;GRAPHIC =         
+0x04bf	db #c0	;GRAPHIC = ##      
+0x04c0	db #c0	;GRAPHIC = ##      
+0x04c1	db #c0	;GRAPHIC = ##      
+0x04c2	db #c0	;GRAPHIC = ##      
+0x04c3	db #c0	;GRAPHIC = ##      
+0x04c4	db #00	;GRAPHIC =         
+0x04c5	db #00	;GRAPHIC =         
+0x04c6	db #fc	;GRAPHIC = ######  
+0x04c7	db #04	;GRAPHIC =      #  
+0x04c8	db #04	;GRAPHIC =      #  
+0x04c9	db #04	;GRAPHIC =      #  
+0x04ca	db #04	;GRAPHIC =      #  
+0x04cb	db #04	;GRAPHIC =      #  
+0x04cc	db #04	;GRAPHIC =      #  
+0x04cd	db #04	;GRAPHIC =      #  
+0x04ce	db #04	;GRAPHIC =      #  
+0x04cf	db #fc	;GRAPHIC = ######  
+0x04d0	db #10	;GRAPHIC =    #    
+0x04d1	db #10	;GRAPHIC =    #    
+0x04d2	db #ff	;GRAPHIC = ########
+0x04d3	db #f9	;GRAPHIC = #####  #
+0x04d4	db #81	;GRAPHIC = #      #
+0x04d5	db #b9	;GRAPHIC = # ###  #
+0x04d6	db #8b	;GRAPHIC = #   # ##
+0x04d7	db #9a	;GRAPHIC = #  ## # 
+0x04d8	db #9a	;GRAPHIC = #  ## # 
+0x04d9	db #fa	;GRAPHIC = ##### # 
+0x04da	db #00	;GRAPHIC =         
+0x04db	db #fa	;GRAPHIC = ##### # 
+0x04dc	db #8a	;GRAPHIC = #   # # 
+0x04dd	db #9a	;GRAPHIC = #  ## # 
+0x04de	db #9a	;GRAPHIC = #  ## # 
+0x04df	db #9b	;GRAPHIC = #  ## ##
+0x04e0	db #99	;GRAPHIC = #  ##  #
+0x04e1	db #f8	;GRAPHIC = #####   
+0x04e2	db #e6	;GRAPHIC = ###  ## 
+0x04e3	db #25	;GRAPHIC =   #  # #	ASCII(%)
+0x04e4	db #25	;GRAPHIC =   #  # #	ASCII(%)
+0x04e5	db #f4	;GRAPHIC = #### #  
+0x04e6	db #34	;GRAPHIC =   ## #  	ASCII(4)
+0x04e7	db #34	;GRAPHIC =   ## #  	ASCII(4)
+0x04e8	db #34	;GRAPHIC =   ## #  	ASCII(4)
+0x04e9	db #00	;GRAPHIC =         
+0x04ea	db #17	;GRAPHIC =    # ###
+0x04eb	db #14	;GRAPHIC =    # #  
+0x04ec	db #34	;GRAPHIC =   ## #  	ASCII(4)
+0x04ed	db #37	;GRAPHIC =   ## ###	ASCII(7)
+0x04ee	db #36	;GRAPHIC =   ## ## 	ASCII(6)
+0x04ef	db #26	;GRAPHIC =   #  ## 	ASCII(&)
+0x04f0	db #c7	;GRAPHIC = ##   ###
+0x04f1	db #df	;GRAPHIC = ## #####
+0x04f2	db #50	;GRAPHIC =  # #    	ASCII(P)
+0x04f3	db #50	;GRAPHIC =  # #    	ASCII(P)
+0x04f4	db #5c	;GRAPHIC =  # ###  	ASCII(\)
+0x04f5	db #d8	;GRAPHIC = ## ##   
+0x04f6	db #d8	;GRAPHIC = ## ##   
+0x04f7	db #df	;GRAPHIC = ## #####
+0x04f8	db #00	;GRAPHIC =         
+0x04f9	db #df	;GRAPHIC = ## #####
+0x04fa	db #11	;GRAPHIC =    #   #
+0x04fb	db #1f	;GRAPHIC =    #####
+0x04fc	db #12	;GRAPHIC =    #  # 
+0x04fd	db #1b	;GRAPHIC =    ## ##
+0x04fe	db #19	;GRAPHIC =    ##  #
+0x04ff	db #d9	;GRAPHIC = ## ##  #
+0x0500	db #7c	;GRAPHIC =  #####  	ASCII(|)
+0x0501	db #44	;GRAPHIC =  #   #  	ASCII(D)
+0x0502	db #fe	;GRAPHIC = ####### 
+0x0503	db #86	;GRAPHIC = #    ## 
+0x0504	db #86	;GRAPHIC = #    ## 
+0x0505	db #86	;GRAPHIC = #    ## 
+0x0506	db #fc	;GRAPHIC = ######  
+0x0507	db #84	;GRAPHIC = #    #  
+0x0508	db #fe	;GRAPHIC = ####### 
+0x0509	db #82	;GRAPHIC = #     # 
+0x050a	db #82	;GRAPHIC = #     # 
+0x050b	db #fe	;GRAPHIC = ####### 
+0x050c	db #fe	;GRAPHIC = ####### 
+0x050d	db #80	;GRAPHIC = #       
+0x050e	db #c0	;GRAPHIC = ##      
+0x050f	db #c0	;GRAPHIC = ##      
+0x0510	db #c0	;GRAPHIC = ##      
+0x0511	db #fe	;GRAPHIC = ####### 
+0x0512	db #fc	;GRAPHIC = ######  
+0x0513	db #82	;GRAPHIC = #     # 
+0x0514	db #c2	;GRAPHIC = ##    # 
+0x0515	db #c2	;GRAPHIC = ##    # 
+0x0516	db #c2	;GRAPHIC = ##    # 
+0x0517	db #fc	;GRAPHIC = ######  
+0x0518	db #fe	;GRAPHIC = ####### 
+0x0519	db #80	;GRAPHIC = #       
+0x051a	db #f8	;GRAPHIC = #####   
+0x051b	db #c0	;GRAPHIC = ##      
+0x051c	db #c0	;GRAPHIC = ##      
+0x051d	db #fe	;GRAPHIC = ####### 
+0x051e	db #fe	;GRAPHIC = ####### 
+0x051f	db #80	;GRAPHIC = #       
+0x0520	db #f0	;GRAPHIC = ####    
+0x0521	db #c0	;GRAPHIC = ##      
+0x0522	db #c0	;GRAPHIC = ##      
+0x0523	db #c0	;GRAPHIC = ##      
+0x0524	db #fe	;GRAPHIC = ####### 
+0x0525	db #80	;GRAPHIC = #       
+0x0526	db #be	;GRAPHIC = # ##### 
+0x0527	db #86	;GRAPHIC = #    ## 
+0x0528	db #86	;GRAPHIC = #    ## 
+0x0529	db #fe	;GRAPHIC = ####### 
+0x052a	db #86	;GRAPHIC = #    ## 
+0x052b	db #86	;GRAPHIC = #    ## 
+0x052c	db #fe	;GRAPHIC = ####### 
+0x052d	db #86	;GRAPHIC = #    ## 
+0x052e	db #86	;GRAPHIC = #    ## 
+0x052f	db #86	;GRAPHIC = #    ## 
+0x0530	db #10	;GRAPHIC =    #    
+0x0531	db #10	;GRAPHIC =    #    
+0x0532	db #10	;GRAPHIC =    #    
+0x0533	db #10	;GRAPHIC =    #    
+0x0534	db #10	;GRAPHIC =    #    
+0x0535	db #10	;GRAPHIC =    #    
+0x0536	db #18	;GRAPHIC =    ##   
+0x0537	db #18	;GRAPHIC =    ##   
+0x0538	db #18	;GRAPHIC =    ##   
+0x0539	db #48	;GRAPHIC =  #  #   	ASCII(H)
+0x053a	db #48	;GRAPHIC =  #  #   	ASCII(H)
+0x053b	db #78	;GRAPHIC =  ####   	ASCII(x)
+0x053c	db #9c	;GRAPHIC = #  ###  
+0x053d	db #90	;GRAPHIC = #  #    
+0x053e	db #b0	;GRAPHIC = # ##    
+0x053f	db #c0	;GRAPHIC = ##      
+0x0540	db #b0	;GRAPHIC = # ##    
+0x0541	db #9c	;GRAPHIC = #  ###  
+0x0542	db #80	;GRAPHIC = #       
+0x0543	db #80	;GRAPHIC = #       
+0x0544	db #c0	;GRAPHIC = ##      
+0x0545	db #c0	;GRAPHIC = ##      
+0x0546	db #c0	;GRAPHIC = ##      
+0x0547	db #fe	;GRAPHIC = ####### 
+0x0548	db #ee	;GRAPHIC = ### ### 
+0x0549	db #92	;GRAPHIC = #  #  # 
+0x054a	db #92	;GRAPHIC = #  #  # 
+0x054b	db #86	;GRAPHIC = #    ## 
+0x054c	db #86	;GRAPHIC = #    ## 
+0x054d	db #86	;GRAPHIC = #    ## 
+0x054e	db #fe	;GRAPHIC = ####### 
+0x054f	db #82	;GRAPHIC = #     # 
+0x0550	db #86	;GRAPHIC = #    ## 
+0x0551	db #86	;GRAPHIC = #    ## 
+0x0552	db #86	;GRAPHIC = #    ## 
+0x0553	db #86	;GRAPHIC = #    ## 
+0x0554	db #7c	;GRAPHIC =  #####  	ASCII(|)
+0x0555	db #82	;GRAPHIC = #     # 
+0x0556	db #86	;GRAPHIC = #    ## 
+0x0557	db #86	;GRAPHIC = #    ## 
+0x0558	db #86	;GRAPHIC = #    ## 
+0x0559	db #7c	;GRAPHIC =  #####  	ASCII(|)
+0x055a	db #fe	;GRAPHIC = ####### 
+0x055b	db #82	;GRAPHIC = #     # 
+0x055c	db #fe	;GRAPHIC = ####### 
+0x055d	db #c0	;GRAPHIC = ##      
+0x055e	db #c0	;GRAPHIC = ##      
+0x055f	db #c0	;GRAPHIC = ##      
+0x0560	db #7c	;GRAPHIC =  #####  	ASCII(|)
+0x0561	db #82	;GRAPHIC = #     # 
+0x0562	db #c2	;GRAPHIC = ##    # 
+0x0563	db #ca	;GRAPHIC = ##  # # 
+0x0564	db #c4	;GRAPHIC = ##   #  
+0x0565	db #7a	;GRAPHIC =  #### # 	ASCII(z)
+0x0566	db #fe	;GRAPHIC = ####### 
+0x0567	db #86	;GRAPHIC = #    ## 
+0x0568	db #fe	;GRAPHIC = ####### 
+0x0569	db #90	;GRAPHIC = #  #    
+0x056a	db #9c	;GRAPHIC = #  ###  
+0x056b	db #84	;GRAPHIC = #    #  
+0x056c	db #fe	;GRAPHIC = ####### 
+0x056d	db #c0	;GRAPHIC = ##      
+0x056e	db #fe	;GRAPHIC = ####### 
+0x056f	db #02	;GRAPHIC =       # 
+0x0570	db #02	;GRAPHIC =       # 
+0x0571	db #fe	;GRAPHIC = ####### 
+0x0572	db #fe	;GRAPHIC = ####### 
+0x0573	db #10	;GRAPHIC =    #    
+0x0574	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x0575	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x0576	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x0577	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x0578	db #82	;GRAPHIC = #     # 
+0x0579	db #82	;GRAPHIC = #     # 
+0x057a	db #c2	;GRAPHIC = ##    # 
+0x057b	db #c2	;GRAPHIC = ##    # 
+0x057c	db #c2	;GRAPHIC = ##    # 
+0x057d	db #fe	;GRAPHIC = ####### 
+0x057e	db #82	;GRAPHIC = #     # 
+0x057f	db #82	;GRAPHIC = #     # 
+0x0580	db #82	;GRAPHIC = #     # 
+0x0581	db #ee	;GRAPHIC = ### ### 
+0x0582	db #38	;GRAPHIC =   ###   	ASCII(8)
+0x0583	db #10	;GRAPHIC =    #    
+0x0584	db #86	;GRAPHIC = #    ## 
+0x0585	db #86	;GRAPHIC = #    ## 
+0x0586	db #96	;GRAPHIC = #  # ## 
+0x0587	db #92	;GRAPHIC = #  #  # 
+0x0588	db #92	;GRAPHIC = #  #  # 
+0x0589	db #ee	;GRAPHIC = ### ### 
+0x058a	db #82	;GRAPHIC = #     # 
+0x058b	db #44	;GRAPHIC =  #   #  	ASCII(D)
+0x058c	db #38	;GRAPHIC =   ###   	ASCII(8)
+0x058d	db #38	;GRAPHIC =   ###   	ASCII(8)
+0x058e	db #44	;GRAPHIC =  #   #  	ASCII(D)
+0x058f	db #82	;GRAPHIC = #     # 
+0x0590	db #82	;GRAPHIC = #     # 
+0x0591	db #82	;GRAPHIC = #     # 
+0x0592	db #fe	;GRAPHIC = ####### 
+0x0593	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x0594	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x0595	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x0596	db #fe	;GRAPHIC = ####### 
+0x0597	db #02	;GRAPHIC =       # 
+0x0598	db #1e	;GRAPHIC =    #### 
+0x0599	db #f0	;GRAPHIC = ####    
+0x059a	db #80	;GRAPHIC = #       
+0x059b	db #fe	;GRAPHIC = ####### 
+0x059c	db #00	;GRAPHIC =         
+0x059d	db #00	;GRAPHIC =         
+0x059e	db #00	;GRAPHIC =         
+0x059f	db #00	;GRAPHIC =         
+0x05a0	db #06	;GRAPHIC =      ## 
+0x05a1	db #06	;GRAPHIC =      ## 
+0x05a2	db #00	;GRAPHIC =         
+0x05a3	db #00	;GRAPHIC =         
+0x05a4	db #00	;GRAPHIC =         
+0x05a5	db #60	;GRAPHIC =  ##     	ASCII(`)
+0x05a6	db #60	;GRAPHIC =  ##     	ASCII(`)
+0x05a7	db #c0	;GRAPHIC = ##      
+0x05a8	db #00	;GRAPHIC =         
+0x05a9	db #00	;GRAPHIC =         
+0x05aa	db #00	;GRAPHIC =         
+0x05ab	db #00	;GRAPHIC =         
+0x05ac	db #00	;GRAPHIC =         
+0x05ad	db #00	;GRAPHIC =         
+0x05ae	db #18	;GRAPHIC =    ##   
+0x05af	db #18	;GRAPHIC =    ##   
+0x05b0	db #18	;GRAPHIC =    ##   
+0x05b1	db #18	;GRAPHIC =    ##   
+0x05b2	db #00	;GRAPHIC =         
+0x05b3	db #18	;GRAPHIC =    ##   
+0x05b4	db #7c	;GRAPHIC =  #####  	ASCII(|)
+0x05b5	db #c6	;GRAPHIC = ##   ## 
+0x05b6	db #0c	;GRAPHIC =     ##  
+0x05b7	db #18	;GRAPHIC =    ##   
+0x05b8	db #00	;GRAPHIC =         
+0x05b9	db #18	;GRAPHIC =    ##   
+0x05ba	db #00	;GRAPHIC =         
+0x05bb	db #00	;GRAPHIC =         
+0x05bc	db #fe	;GRAPHIC = ####### 
+0x05bd	db #fe	;GRAPHIC = ####### 
+0x05be	db #00	;GRAPHIC =         
+0x05bf	db #00	;GRAPHIC =         
+0x05c0	db #fe	;GRAPHIC = ####### 
+0x05c1	db #82	;GRAPHIC = #     # 
+0x05c2	db #86	;GRAPHIC = #    ## 
+0x05c3	db #86	;GRAPHIC = #    ## 
+0x05c4	db #86	;GRAPHIC = #    ## 
+0x05c5	db #fe	;GRAPHIC = ####### 
+0x05c6	db #08	;GRAPHIC =     #   
+0x05c7	db #08	;GRAPHIC =     #   
+0x05c8	db #08	;GRAPHIC =     #   
+0x05c9	db #18	;GRAPHIC =    ##   
+0x05ca	db #18	;GRAPHIC =    ##   
+0x05cb	db #18	;GRAPHIC =    ##   
+0x05cc	db #fe	;GRAPHIC = ####### 
+0x05cd	db #02	;GRAPHIC =       # 
+0x05ce	db #fe	;GRAPHIC = ####### 
+0x05cf	db #c0	;GRAPHIC = ##      
+0x05d0	db #c0	;GRAPHIC = ##      
+0x05d1	db #fe	;GRAPHIC = ####### 
+0x05d2	db #fe	;GRAPHIC = ####### 
+0x05d3	db #02	;GRAPHIC =       # 
+0x05d4	db #1e	;GRAPHIC =    #### 
+0x05d5	db #06	;GRAPHIC =      ## 
+0x05d6	db #06	;GRAPHIC =      ## 
+0x05d7	db #fe	;GRAPHIC = ####### 
+0x05d8	db #84	;GRAPHIC = #    #  
+0x05d9	db #c4	;GRAPHIC = ##   #  
+0x05da	db #c4	;GRAPHIC = ##   #  
+0x05db	db #fe	;GRAPHIC = ####### 
+0x05dc	db #04	;GRAPHIC =      #  
+0x05dd	db #04	;GRAPHIC =      #  
+0x05de	db #fe	;GRAPHIC = ####### 
+0x05df	db #80	;GRAPHIC = #       
+0x05e0	db #fe	;GRAPHIC = ####### 
+0x05e1	db #06	;GRAPHIC =      ## 
+0x05e2	db #06	;GRAPHIC =      ## 
+0x05e3	db #fe	;GRAPHIC = ####### 
+0x05e4	db #c0	;GRAPHIC = ##      
+0x05e5	db #c0	;GRAPHIC = ##      
+0x05e6	db #c0	;GRAPHIC = ##      
+0x05e7	db #fe	;GRAPHIC = ####### 
+0x05e8	db #82	;GRAPHIC = #     # 
+0x05e9	db #fe	;GRAPHIC = ####### 
+0x05ea	db #fe	;GRAPHIC = ####### 
+0x05eb	db #02	;GRAPHIC =       # 
+0x05ec	db #02	;GRAPHIC =       # 
+0x05ed	db #06	;GRAPHIC =      ## 
+0x05ee	db #06	;GRAPHIC =      ## 
+0x05ef	db #06	;GRAPHIC =      ## 
+0x05f0	db #7c	;GRAPHIC =  #####  	ASCII(|)
+0x05f1	db #44	;GRAPHIC =  #   #  	ASCII(D)
+0x05f2	db #fe	;GRAPHIC = ####### 
+0x05f3	db #86	;GRAPHIC = #    ## 
+0x05f4	db #86	;GRAPHIC = #    ## 
+0x05f5	db #fe	;GRAPHIC = ####### 
+0x05f6	db #fe	;GRAPHIC = ####### 
+0x05f7	db #82	;GRAPHIC = #     # 
+0x05f8	db #fe	;GRAPHIC = ####### 
+0x05f9	db #06	;GRAPHIC =      ## 
+0x05fa	db #06	;GRAPHIC =      ## 
+0x05fb	db #06	;GRAPHIC =      ## 
+0x05fc	db #44	;GRAPHIC =  #   #  	ASCII(D)
+0x05fd	db #fe	;GRAPHIC = ####### 
+0x05fe	db #44	;GRAPHIC =  #   #  	ASCII(D)
+0x05ff	db #44	;GRAPHIC =  #   #  	ASCII(D)
+0x0600	db #fe	;GRAPHIC = ####### 
+0x0601	db #44	;GRAPHIC =  #   #  	ASCII(D)
+0x0602	db #a8	;GRAPHIC = # # #   
+0x0603	db #a8	;GRAPHIC = # # #   
+0x0604	db #a8	;GRAPHIC = # # #   
+0x0605	db #a8	;GRAPHIC = # # #   
+0x0606	db #a8	;GRAPHIC = # # #   
+0x0607	db #a8	;GRAPHIC = # # #   
+0x0608	db #a8	;GRAPHIC = # # #   
+0x0609	db #6c	;GRAPHIC =  ## ##  	ASCII(l)
+0x060a	db #5a	;GRAPHIC =  # ## # 	ASCII(Z)
+0x060b	db #00	;GRAPHIC =         
+0x060c	db #0c	;GRAPHIC =     ##  
+0x060d	db #18	;GRAPHIC =    ##   
+0x060e	db #a8	;GRAPHIC = # # #   
+0x060f	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x0610	db #4e	;GRAPHIC =  #  ### 	ASCII(N)
+0x0611	db #7e	;GRAPHIC =  ###### 	ASCII(~)
+0x0612	db #00	;GRAPHIC =         
+0x0613	db #12	;GRAPHIC =    #  # 
+0x0614	db #18	;GRAPHIC =    ##   
+0x0615	db #66	;GRAPHIC =  ##  ## 	ASCII(f)
+0x0616	db #6c	;GRAPHIC =  ## ##  	ASCII(l)
+0x0617	db #a8	;GRAPHIC = # # #   
+0x0618	db #5a	;GRAPHIC =  # ## # 	ASCII(Z)
+0x0619	db #66	;GRAPHIC =  ##  ## 	ASCII(f)
+0x061a	db #54	;GRAPHIC =  # # #  	ASCII(T)
+0x061b	db #24	;GRAPHIC =   #  #  	ASCII($)
+0x061c	db #66	;GRAPHIC =  ##  ## 	ASCII(f)
+0x061d	db #00	;GRAPHIC =         
+0x061e	db #48	;GRAPHIC =  #  #   	ASCII(H)
+0x061f	db #48	;GRAPHIC =  #  #   	ASCII(H)
+0x0620	db #18	;GRAPHIC =    ##   
+0x0621	db #12	;GRAPHIC =    #  # 
+0x0622	db #a8	;GRAPHIC = # # #   
+0x0623	db #06	;GRAPHIC =      ## 
+0x0624	db #90	;GRAPHIC = #  #    
+0x0625	db #a8	;GRAPHIC = # # #   
+0x0626	db #12	;GRAPHIC =    #  # 
+0x0627	db #00	;GRAPHIC =         
+0x0628	db #7e	;GRAPHIC =  ###### 	ASCII(~)
+0x0629	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x062a	db #12	;GRAPHIC =    #  # 
+0x062b	db #a8	;GRAPHIC = # # #   
+0x062c	db #84	;GRAPHIC = #    #  
+0x062d	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x062e	db #4e	;GRAPHIC =  #  ### 	ASCII(N)
+0x062f	db #72	;GRAPHIC =  ###  # 	ASCII(r)
+0x0630	db #18	;GRAPHIC =    ##   
+0x0631	db #66	;GRAPHIC =  ##  ## 	ASCII(f)
+0x0632	db #a8	;GRAPHIC = # # #   
+0x0633	db #a8	;GRAPHIC = # # #   
+0x0634	db #a8	;GRAPHIC = # # #   
+0x0635	db #a8	;GRAPHIC = # # #   
+0x0636	db #a8	;GRAPHIC = # # #   
+0x0637	db #a8	;GRAPHIC = # # #   
+0x0638	db #90	;GRAPHIC = #  #    
+0x0639	db #54	;GRAPHIC =  # # #  	ASCII(T)
+0x063a	db #78	;GRAPHIC =  ####   	ASCII(x)
+0x063b	db #a8	;GRAPHIC = # # #   
+0x063c	db #48	;GRAPHIC =  #  #   	ASCII(H)
+0x063d	db #78	;GRAPHIC =  ####   	ASCII(x)
+0x063e	db #6c	;GRAPHIC =  ## ##  	ASCII(l)
+0x063f	db #72	;GRAPHIC =  ###  # 	ASCII(r)
+0x0640	db #a8	;GRAPHIC = # # #   
+0x0641	db #12	;GRAPHIC =    #  # 
+0x0642	db #18	;GRAPHIC =    ##   
+0x0643	db #6c	;GRAPHIC =  ## ##  	ASCII(l)
+0x0644	db #72	;GRAPHIC =  ###  # 	ASCII(r)
+0x0645	db #66	;GRAPHIC =  ##  ## 	ASCII(f)
+0x0646	db #54	;GRAPHIC =  # # #  	ASCII(T)
+0x0647	db #90	;GRAPHIC = #  #    
+0x0648	db #a8	;GRAPHIC = # # #   
+0x0649	db #72	;GRAPHIC =  ###  # 	ASCII(r)
+0x064a	db #2a	;GRAPHIC =   # # # 	ASCII(*)
+0x064b	db #18	;GRAPHIC =    ##   
+0x064c	db #a8	;GRAPHIC = # # #   
+0x064d	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x064e	db #4e	;GRAPHIC =  #  ### 	ASCII(N)
+0x064f	db #7e	;GRAPHIC =  ###### 	ASCII(~)
+0x0650	db #00	;GRAPHIC =         
+0x0651	db #12	;GRAPHIC =    #  # 
+0x0652	db #18	;GRAPHIC =    ##   
+0x0653	db #66	;GRAPHIC =  ##  ## 	ASCII(f)
+0x0654	db #6c	;GRAPHIC =  ## ##  	ASCII(l)
+0x0655	db #a8	;GRAPHIC = # # #   
+0x0656	db #72	;GRAPHIC =  ###  # 	ASCII(r)
+0x0657	db #54	;GRAPHIC =  # # #  	ASCII(T)
+0x0658	db #a8	;GRAPHIC = # # #   
+0x0659	db #5a	;GRAPHIC =  # ## # 	ASCII(Z)
+0x065a	db #66	;GRAPHIC =  ##  ## 	ASCII(f)
+0x065b	db #18	;GRAPHIC =    ##   
+0x065c	db #7e	;GRAPHIC =  ###### 	ASCII(~)
+0x065d	db #18	;GRAPHIC =    ##   
+0x065e	db #4e	;GRAPHIC =  #  ### 	ASCII(N)
+0x065f	db #72	;GRAPHIC =  ###  # 	ASCII(r)
+0x0660	db #a8	;GRAPHIC = # # #   
+0x0661	db #72	;GRAPHIC =  ###  # 	ASCII(r)
+0x0662	db #2a	;GRAPHIC =   # # # 	ASCII(*)
+0x0663	db #18	;GRAPHIC =    ##   
+0x0664	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x0665	db #66	;GRAPHIC =  ##  ## 	ASCII(f)
+0x0666	db #a8	;GRAPHIC = # # #   
+0x0667	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x0668	db #4e	;GRAPHIC =  #  ### 	ASCII(N)
+0x0669	db #7e	;GRAPHIC =  ###### 	ASCII(~)
+0x066a	db #00	;GRAPHIC =         
+0x066b	db #6c	;GRAPHIC =  ## ##  	ASCII(l)
+0x066c	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x066d	db #54	;GRAPHIC =  # # #  	ASCII(T)
+0x066e	db #4e	;GRAPHIC =  #  ### 	ASCII(N)
+0x066f	db #9c	;GRAPHIC = #  ###  
+0x0670	db #a8	;GRAPHIC = # # #   
+0x0671	db #a8	;GRAPHIC = # # #   
+0x0672	db #a8	;GRAPHIC = # # #   
+0x0673	db #a8	;GRAPHIC = # # #   
+0x0674	db #a8	;GRAPHIC = # # #   
+0x0675	db #a8	;GRAPHIC = # # #   
+0x0676	db #a8	;GRAPHIC = # # #   
+0x0677	db #48	;GRAPHIC =  #  #   	ASCII(H)
+0x0678	db #54	;GRAPHIC =  # # #  	ASCII(T)
+0x0679	db #7e	;GRAPHIC =  ###### 	ASCII(~)
+0x067a	db #18	;GRAPHIC =    ##   
+0x067b	db #a8	;GRAPHIC = # # #   
+0x067c	db #90	;GRAPHIC = #  #    
+0x067d	db #54	;GRAPHIC =  # # #  	ASCII(T)
+0x067e	db #78	;GRAPHIC =  ####   	ASCII(x)
+0x067f	db #66	;GRAPHIC =  ##  ## 	ASCII(f)
+0x0680	db #a8	;GRAPHIC = # # #   
+0x0681	db #6c	;GRAPHIC =  ## ##  	ASCII(l)
+0x0682	db #2a	;GRAPHIC =   # # # 	ASCII(*)
+0x0683	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x0684	db #5a	;GRAPHIC =  # ## # 	ASCII(Z)
+0x0685	db #a8	;GRAPHIC = # # #   
+0x0686	db #84	;GRAPHIC = #    #  
+0x0687	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x0688	db #72	;GRAPHIC =  ###  # 	ASCII(r)
+0x0689	db #2a	;GRAPHIC =   # # # 	ASCII(*)
+0x068a	db #a8	;GRAPHIC = # # #   
+0x068b	db #d8	;GRAPHIC = ## ##   
+0x068c	db #a8	;GRAPHIC = # # #   
+0x068d	db #00	;GRAPHIC =         
+0x068e	db #4e	;GRAPHIC =  #  ### 	ASCII(N)
+0x068f	db #12	;GRAPHIC =    #  # 
+0x0690	db #a8	;GRAPHIC = # # #   
+0x0691	db #e4	;GRAPHIC = ###  #  
+0x0692	db #a2	;GRAPHIC = # #   # 
+0x0693	db #a8	;GRAPHIC = # # #   
+0x0694	db #00	;GRAPHIC =         
+0x0695	db #4e	;GRAPHIC =  #  ### 	ASCII(N)
+0x0696	db #12	;GRAPHIC =    #  # 
+0x0697	db #a8	;GRAPHIC = # # #   
+0x0698	db #6c	;GRAPHIC =  ## ##  	ASCII(l)
+0x0699	db #2a	;GRAPHIC =   # # # 	ASCII(*)
+0x069a	db #54	;GRAPHIC =  # # #  	ASCII(T)
+0x069b	db #54	;GRAPHIC =  # # #  	ASCII(T)
+0x069c	db #72	;GRAPHIC =  ###  # 	ASCII(r)
+0x069d	db #a8	;GRAPHIC = # # #   
+0x069e	db #84	;GRAPHIC = #    #  
+0x069f	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x06a0	db #72	;GRAPHIC =  ###  # 	ASCII(r)
+0x06a1	db #2a	;GRAPHIC =   # # # 	ASCII(*)
+0x06a2	db #a8	;GRAPHIC = # # #   
+0x06a3	db #de	;GRAPHIC = ## #### 
+0x06a4	db #9c	;GRAPHIC = #  ###  
+0x06a5	db #a8	;GRAPHIC = # # #   
+0x06a6	db #72	;GRAPHIC =  ###  # 	ASCII(r)
+0x06a7	db #2a	;GRAPHIC =   # # # 	ASCII(*)
+0x06a8	db #18	;GRAPHIC =    ##   
+0x06a9	db #a8	;GRAPHIC = # # #   
+0x06aa	db #0c	;GRAPHIC =     ##  
+0x06ab	db #54	;GRAPHIC =  # # #  	ASCII(T)
+0x06ac	db #48	;GRAPHIC =  #  #   	ASCII(H)
+0x06ad	db #5a	;GRAPHIC =  # ## # 	ASCII(Z)
+0x06ae	db #78	;GRAPHIC =  ####   	ASCII(x)
+0x06af	db #72	;GRAPHIC =  ###  # 	ASCII(r)
+0x06b0	db #18	;GRAPHIC =    ##   
+0x06b1	db #66	;GRAPHIC =  ##  ## 	ASCII(f)
+0x06b2	db #a8	;GRAPHIC = # # #   
+0x06b3	db #72	;GRAPHIC =  ###  # 	ASCII(r)
+0x06b4	db #18	;GRAPHIC =    ##   
+0x06b5	db #42	;GRAPHIC =  #    # 	ASCII(B)
+0x06b6	db #42	;GRAPHIC =  #    # 	ASCII(B)
+0x06b7	db #6c	;GRAPHIC =  ## ##  	ASCII(l)
+0x06b8	db #a8	;GRAPHIC = # # #   
+0x06b9	db #72	;GRAPHIC =  ###  # 	ASCII(r)
+0x06ba	db #2a	;GRAPHIC =   # # # 	ASCII(*)
+0x06bb	db #00	;GRAPHIC =         
+0x06bc	db #72	;GRAPHIC =  ###  # 	ASCII(r)
+0x06bd	db #a8	;GRAPHIC = # # #   
+0x06be	db #72	;GRAPHIC =  ###  # 	ASCII(r)
+0x06bf	db #2a	;GRAPHIC =   # # # 	ASCII(*)
+0x06c0	db #18	;GRAPHIC =    ##   
+0x06c1	db #a8	;GRAPHIC = # # #   
+0x06c2	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x06c3	db #4e	;GRAPHIC =  #  ### 	ASCII(N)
+0x06c4	db #7e	;GRAPHIC =  ###### 	ASCII(~)
+0x06c5	db #00	;GRAPHIC =         
+0x06c6	db #12	;GRAPHIC =    #  # 
+0x06c7	db #18	;GRAPHIC =    ##   
+0x06c8	db #66	;GRAPHIC =  ##  ## 	ASCII(f)
+0x06c9	db #6c	;GRAPHIC =  ## ##  	ASCII(l)
+0x06ca	db #a8	;GRAPHIC = # # #   
+0x06cb	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x06cc	db #4e	;GRAPHIC =  #  ### 	ASCII(N)
+0x06cd	db #0c	;GRAPHIC =     ##  
+0x06ce	db #66	;GRAPHIC =  ##  ## 	ASCII(f)
+0x06cf	db #18	;GRAPHIC =    ##   
+0x06d0	db #00	;GRAPHIC =         
+0x06d1	db #6c	;GRAPHIC =  ## ##  	ASCII(l)
+0x06d2	db #18	;GRAPHIC =    ##   
+0x06d3	db #a8	;GRAPHIC = # # #   
+0x06d4	db #72	;GRAPHIC =  ###  # 	ASCII(r)
+0x06d5	db #2a	;GRAPHIC =   # # # 	ASCII(*)
+0x06d6	db #18	;GRAPHIC =    ##   
+0x06d7	db #30	;GRAPHIC =   ##    	ASCII(0)
+0x06d8	db #66	;GRAPHIC =  ##  ## 	ASCII(f)
+0x06d9	db #a8	;GRAPHIC = # # #   
+0x06da	db #1e	;GRAPHIC =    #### 
+0x06db	db #54	;GRAPHIC =  # # #  	ASCII(T)
+0x06dc	db #66	;GRAPHIC =  ##  ## 	ASCII(f)
+0x06dd	db #0c	;GRAPHIC =     ##  
+0x06de	db #18	;GRAPHIC =    ##   
+0x06df	db #9c	;GRAPHIC = #  ###  
+0x06e0	db #a8	;GRAPHIC = # # #   
+0x06e1	db #24	;GRAPHIC =   #  #  	ASCII($)
+0x06e2	db #54	;GRAPHIC =  # # #  	ASCII(T)
+0x06e3	db #54	;GRAPHIC =  # # #  	ASCII(T)
+0x06e4	db #12	;GRAPHIC =    #  # 
+0x06e5	db #a8	;GRAPHIC = # # #   
+0x06e6	db #42	;GRAPHIC =  #    # 	ASCII(B)
+0x06e7	db #78	;GRAPHIC =  ####   	ASCII(x)
+0x06e8	db #0c	;GRAPHIC =     ##  
+0x06e9	db #3c	;GRAPHIC =   ####  	ASCII(<)
+0x06ea	db #a8	;GRAPHIC = # # #   
+0x06eb	db #ae	;GRAPHIC = # # ### 
+0x06ec	db #a8	;GRAPHIC = # # #   
+0x06ed	db #a8	;GRAPHIC = # # #   
+0x06ee	db #a8	;GRAPHIC = # # #   
+0x06ef	db #a8	;GRAPHIC = # # #   
+0x06f0	db #a8	;GRAPHIC = # # #   
+0x06f1	db #a8	;GRAPHIC = # # #   
+0x06f2	db #a8	;GRAPHIC = # # #   
+0x06f3	db #ff	;GRAPHIC = ########
+0x06f4	db #00	;GRAPHIC =         
+0x06f5	db #00	;GRAPHIC =         
+0x06f6	db #00	;GRAPHIC =         
+0x06f7	db #00	;GRAPHIC =         
+0x06f8	db #00	;GRAPHIC =         
+0x06f9	db #00	;GRAPHIC =         
+0x06fa	db #00	;GRAPHIC =         
+0x06fb	db #00	;GRAPHIC =         
+0x06fc	db #00	;GRAPHIC =         
+0x06fd	db #00	;GRAPHIC =         
+0x06fe	db #00	;GRAPHIC =         
+0x06ff	db #00	;GRAPHIC =         
+0x0700	db #00	;GRAPHIC =         
+0x0701	db #00	;GRAPHIC =         
+0x0702	db #00	;GRAPHIC =         
