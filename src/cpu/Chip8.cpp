@@ -38,8 +38,11 @@ Chipbit::Chip8::Chip8() {
 
   std::copy(m_Font.begin(), m_Font.end(), m_CPU->ram.begin());
 
-  m_OnColor = Color(255, 255, 255, 255);
-  m_OffColor = Color(33, 33, 33,255);
+  //m_OnColor = Color(255, 255, 255, 255);
+ // m_OffColor = Color(33, 33, 33,255);
+
+  m_OnColor = Color(183, 109, 104, 255);
+  m_OffColor = Color(27, 36, 50, 255);
 
   m_CPU->framebuffer = std::vector<unsigned int>(64 * 32, m_OffColor);
 }
