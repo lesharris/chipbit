@@ -3,22 +3,22 @@
 #include "../Chipbit.h"
 
 Chipbit::Input::Input() {
-  addMapping(GLFW_KEY_7, Action::K1, ActionSource::Keyboard);
-  addMapping(GLFW_KEY_8, Action::K2, ActionSource::Keyboard);
-  addMapping(GLFW_KEY_9, Action::K3, ActionSource::Keyboard);
-  addMapping(GLFW_KEY_0, Action::KC, ActionSource::Keyboard);
-  addMapping(GLFW_KEY_U, Action::K4, ActionSource::Keyboard);
-  addMapping(GLFW_KEY_I, Action::K5, ActionSource::Keyboard);
-  addMapping(GLFW_KEY_O, Action::K6, ActionSource::Keyboard);
-  addMapping(GLFW_KEY_P, Action::KD, ActionSource::Keyboard);
-  addMapping(GLFW_KEY_J, Action::K7, ActionSource::Keyboard);
-  addMapping(GLFW_KEY_K, Action::K8, ActionSource::Keyboard);
-  addMapping(GLFW_KEY_L, Action::K9, ActionSource::Keyboard);
-  addMapping(GLFW_KEY_SEMICOLON, Action::KE, ActionSource::Keyboard);
-  addMapping(GLFW_KEY_M, Action::KA, ActionSource::Keyboard);
-  addMapping(GLFW_KEY_COMMA, Action::K0, ActionSource::Keyboard);
-  addMapping(GLFW_KEY_PERIOD, Action::KB, ActionSource::Keyboard);
-  addMapping(GLFW_KEY_SLASH, Action::KF, ActionSource::Keyboard);
+  addMapping(GLFW_KEY_1, Action::K1, ActionSource::Keyboard);
+  addMapping(GLFW_KEY_2, Action::K2, ActionSource::Keyboard);
+  addMapping(GLFW_KEY_3, Action::K3, ActionSource::Keyboard);
+  addMapping(GLFW_KEY_4, Action::KC, ActionSource::Keyboard);
+  addMapping(GLFW_KEY_Q, Action::K4, ActionSource::Keyboard);
+  addMapping(GLFW_KEY_W, Action::K5, ActionSource::Keyboard);
+  addMapping(GLFW_KEY_E, Action::K6, ActionSource::Keyboard);
+  addMapping(GLFW_KEY_R, Action::KD, ActionSource::Keyboard);
+  addMapping(GLFW_KEY_A, Action::K7, ActionSource::Keyboard);
+  addMapping(GLFW_KEY_S, Action::K8, ActionSource::Keyboard);
+  addMapping(GLFW_KEY_D, Action::K9, ActionSource::Keyboard);
+  addMapping(GLFW_KEY_F, Action::KE, ActionSource::Keyboard);
+  addMapping(GLFW_KEY_Z, Action::KA, ActionSource::Keyboard);
+  addMapping(GLFW_KEY_X, Action::K0, ActionSource::Keyboard);
+  addMapping(GLFW_KEY_C, Action::KB, ActionSource::Keyboard);
+  addMapping(GLFW_KEY_V, Action::KF, ActionSource::Keyboard);
 }
 
 void Chipbit::Input::addMapping(int key, Action action, ActionSource source) {

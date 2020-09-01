@@ -1,19 +1,34 @@
 #include "Renderer.h"
 
-#include <iostream>
 #include <glad/glad.h>
 #include "../loaders/ShaderLoader.h"
+#include "../Chipbit.h"
+#include "../core/Log.h"
+#include "../core/EventManager.h"
+
 
 Chipbit::Renderer::Renderer(const Chip8& cpu) {
-  m_Shader = ShaderLoader::load(
+  m_C8Shader = ShaderLoader::load(
       "assets/shaders/chip8.vert.glsl",
       "assets/shaders/chip8.frag.glsl");
 
-  glGenVertexArrays(1, &m_VAO);
-  glGenBuffers(1, &m_VBO);
-  glGenBuffers(1, &m_EBO);
+  m_ScreenShader = ShaderLoader::load(
+      "assets/shaders/chip8-screen.vert.glsl",
+      "assets/shaders/chip8-screen.frag.glsl");
 
-  glBindVertexArray(m_VAO);
+  m_ScreenShader->ConfigureUniforms({
+   {"screenTexture", UniformTypes::Integer}
+  });
+
+  m_ScreenShader->use();
+  m_ScreenShader->SetUniform("screenTexture", 0);
+  Shader::unbind();
+
+  glGenVertexArrays(1, &m_C8VAO);
+  glGenBuffers(1, &m_C8VBO);
+  glGenBuffers(1, &m_C8EBO);
+
+  glBindVertexArray(m_C8VAO);
 
   float vertices[] = {
      -1.0,  1.0, 0.0f, 0.0f,
@@ -27,10 +42,10 @@ Chipbit::Renderer::Renderer(const Chip8& cpu) {
       2, 3, 0
   };
 
-  glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+  glBindBuffer(GL_ARRAY_BUFFER, m_C8VBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_C8EBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
   glEnableVertexAttribArray(0);
@@ -39,8 +54,8 @@ Chipbit::Renderer::Renderer(const Chip8& cpu) {
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), reinterpret_cast<void*>((2 * sizeof(float))));
 
-  glGenTextures(1, &m_Texture);
-  glBindTexture(GL_TEXTURE_2D, m_Texture);
+  glGenTextures(1, &m_C8Texture);
+  glBindTexture(GL_TEXTURE_2D, m_C8Texture);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -49,14 +64,89 @@ Chipbit::Renderer::Renderer(const Chip8& cpu) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
+  float screenVertices[] = {
+      -1.0f,  1.0f,  0.0f, 1.0f,
+      -1.0f, -1.0f,  0.0f, 0.0f,
+       1.0f, -1.0f,  1.0f, 0.0f,
+
+      -1.0f,  1.0f,  0.0f, 1.0f,
+       1.0f, -1.0f,  1.0f, 0.0f,
+       1.0f,  1.0f,  1.0f, 1.0f
+  };
+
+  glGenVertexArrays(1, &m_VAO);
+  glGenBuffers(1, &m_VBO);
+  glBindVertexArray(m_VAO);
+  glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(screenVertices), &screenVertices, GL_STATIC_DRAW);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+  glGenFramebuffers(1, &m_FBO);
+  glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+
+  auto screenSize = Chipbit::Get().GetWindow().GetScreenSize();
+  auto screenScale = Chipbit::Get().GetWindow().GetScale();
+
+  glGenTextures(1, &m_ScreenTexture);
+  glBindTexture(GL_TEXTURE_2D, m_ScreenTexture);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenSize.x * screenScale.x, screenSize.y * screenScale.y, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_ScreenTexture, 0);
+
+  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+    CB_ERROR("Could not generate framebuffer!");
+  }
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+  EventManager::Get().Attach<
+      Events::WindowResizedEvent,
+      &Renderer::HandleScreenResize
+  >(this);
 }
 
-void Chipbit::Renderer::Render(const std::vector<unsigned int>& fb) {
+void Chipbit::Renderer::Draw(const std::vector<unsigned int>& fb) {
+  glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+
+  glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, m_C8Texture);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 64, 32, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, fb.data());
 
-  m_Shader->use();
+  m_C8Shader->use();
 
-  glBindVertexArray(m_VAO);
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+  glBindVertexArray(m_C8VAO);
+  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
   glBindVertexArray(0);
+}
+
+void Chipbit::Renderer::Render() {
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+  m_ScreenShader->use();
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, m_ScreenTexture);
+  glBindVertexArray(m_VAO);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
+  glBindVertexArray(0);
+}
+
+void Chipbit::Renderer::HandleScreenResize(const Events::WindowResizedEvent &event) const {
+  auto& window = Chipbit::Get().GetWindow();
+  auto screenScale = window.GetScale();
+
+  glBindTexture(GL_TEXTURE_2D, m_ScreenTexture);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+               (float)event.width * screenScale.x, (float)event.height * screenScale.y,
+               0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
