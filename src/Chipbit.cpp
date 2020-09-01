@@ -38,7 +38,7 @@ void Chipbit::Chipbit::Run() {
         m_DeltaTime--;
       }
 
-      // 16 cycles per frame
+      // 16 cycles per frame, 960 cycles per second. Make tuneable? Seems about right.
       for(auto i = 0; i < 16; i++)
         m_CPU->Tick();
 
