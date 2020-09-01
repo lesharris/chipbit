@@ -36,7 +36,7 @@ add_executable(chipbit src/main.cpp
     src/Chipbit.h
     src/core/Window.cpp
     src/core/Window.h
-    src/core/Log.h src/core/EventManager.h src/core/events/Events.h src/core/Actions.h src/core/Input.h src/core/Input.cpp src/loaders/ShaderLoader.cpp src/loaders/ShaderLoader.h src/renderer/Shader.cpp src/renderer/Shader.h src/renderer/UniformType.h src/cpu/Chip8.cpp src/cpu/Chip8.h src/loaders/RomLoader.cpp src/loaders/RomLoader.h src/renderer/Renderer.cpp src/renderer/Renderer.h src/gui/Gui.cpp src/gui/Gui.h)
+    src/core/Log.h src/core/EventManager.h src/core/events/Events.h src/core/Actions.h src/core/Input.h src/core/Input.cpp src/loaders/ShaderLoader.cpp src/loaders/ShaderLoader.h src/renderer/Shader.cpp src/renderer/Shader.h src/renderer/UniformType.h src/cpu/Chip8.cpp src/cpu/Chip8.h src/loaders/RomLoader.cpp src/loaders/RomLoader.h src/renderer/Renderer.cpp src/renderer/Renderer.h src/gui/Gui.cpp src/gui/Gui.h deps/imgui_memory_editor.h)
 
 target_link_libraries(chipbit PRIVATE
     glfw

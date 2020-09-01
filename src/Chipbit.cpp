@@ -11,7 +11,7 @@ void Chipbit::Chipbit::Initialize() {
 }
 
 void Chipbit::Chipbit::Run() {
-  auto rom = RomLoader::load("assets/roms/INVADERS");
+  auto rom = RomLoader::load("assets/roms/TETRIS");
   m_CPU->Load(rom, 0x200);
 
   while(!m_Window->ShouldClose()) {
@@ -24,10 +24,10 @@ void Chipbit::Chipbit::Run() {
       {
         std::vector<unsigned char> keyBuf(16, 0);
         auto keys = m_Input->poll();
-        m_CPU->ResetKeys();
 
-        for (const auto key : keys)
+        std::for_each(keys.begin(), keys.end(), [&](Action key) {
           keyBuf[ActionToKey[key]] = 1;
+        });
 
         m_CPU->SetKeys(keyBuf);
       }
@@ -38,8 +38,7 @@ void Chipbit::Chipbit::Run() {
         m_DeltaTime--;
       }
 
-      // 16 cycles per frame, 960 cycles per second. Make tuneable? Seems about right.
-      for(auto i = 0; i < 16; i++)
+      for(auto i = 0; i < 8; i++)
         m_CPU->Tick();
 
       // Update Framebuffer texture
@@ -51,7 +50,7 @@ void Chipbit::Chipbit::Run() {
       // Render Framebuffer texture every frame
       m_Renderer->Render();
 
-      m_GUI->Render();
+      m_GUI->Render(m_CPU->Get());
     }
     m_Window->EndFrame();
   }

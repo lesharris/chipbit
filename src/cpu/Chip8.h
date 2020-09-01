@@ -8,29 +8,11 @@
 namespace Chipbit {
   class Chip8 {
   public:
-    Chip8();
-
-    bool Tick();
-    void Load(const std::vector<unsigned char>& data, int address);
-    [[nodiscard]] bool Draw() const { return m_CPU->draw; }
-    void ClearDraw() { m_CPU->draw = false; }
-    void ResetKeys() { m_CPU->keys = std::vector<unsigned char>(16, 0); }
-    void SetKeys(const std::vector<unsigned char>& keys) { m_CPU->keys = keys; }
-    void TickTimers() {
-      if(m_CPU->delay_timer != 0)
-        m_CPU->delay_timer--;
-
-      if(m_CPU->sound_timer != 0)
-        m_CPU->sound_timer--;
-    }
-
-    [[nodiscard]] std::vector<unsigned int> Framebuffer() const { return m_CPU->framebuffer; }
-  private:
     struct CPU {
       CPU() {
         registers = std::vector<unsigned char>(16, 0);
         ram = std::vector<unsigned char>(4096, 0);
-        framebuffer = std::vector<unsigned int>(64 * 32, 0);
+        framebuffer = std::vector<unsigned int>(128 * 64, 0);
         keys = std::vector<unsigned char>(16, 0);
       }
 
@@ -60,6 +42,26 @@ namespace Chipbit {
       std::random_device rd;
       std::mt19937 mt{rd()};
     };
+
+  public:
+    Chip8();
+
+    bool Tick();
+    void Load(const std::vector<unsigned char>& data, int address);
+    [[nodiscard]] bool Draw() const { return m_CPU->draw; }
+    void ClearDraw() { m_CPU->draw = false; }
+    void ResetKeys() { m_CPU->keys = std::vector<unsigned char>(16, 0); }
+    void SetKeys(const std::vector<unsigned char>& keys) { m_CPU->keys = keys; }
+    void TickTimers() {
+      if(m_CPU->delay_timer != 0)
+        m_CPU->delay_timer--;
+
+      if(m_CPU->sound_timer != 0)
+        m_CPU->sound_timer--;
+    }
+
+    CPU& Get() { return *m_CPU; }
+    [[nodiscard]] std::vector<unsigned int> Framebuffer() const { return m_CPU->framebuffer; }
 
   private:
     void Opcode0000(unsigned short operand);
