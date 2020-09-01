@@ -5,10 +5,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 if (WIN32)
   set(CMAKE_PREFIX_PATH C:/lib)
-  if (${CMAKE_BUILD_TYPE} STREQUAL Release)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MD")
-    message(${CMAKE_CXX_FLAGS})
-  endif ()
 endif ()
 
 add_subdirectory(deps/spdlog)
@@ -25,6 +21,7 @@ include_directories(deps/fmt/include)
 
 add_executable(chipbit src/main.cpp
     deps/glad/src/glad.c
+    deps/imgui_memory_editor.h
     deps/imgui/imgui_demo.cpp
     deps/imgui/imgui_draw.cpp
     deps/imgui/imgui_impl_glfw.cpp
@@ -34,9 +31,27 @@ add_executable(chipbit src/main.cpp
     deps/stb_image.h
     src/Chipbit.cpp
     src/Chipbit.h
+    src/core/Actions.h
+    src/core/events/Events.h
+    src/core/Input.cpp
+    src/core/Input.h
+    src/core/Log.h src/core/EventManager.h
     src/core/Window.cpp
     src/core/Window.h
-    src/core/Log.h src/core/EventManager.h src/core/events/Events.h src/core/Actions.h src/core/Input.h src/core/Input.cpp src/loaders/ShaderLoader.cpp src/loaders/ShaderLoader.h src/renderer/Shader.cpp src/renderer/Shader.h src/renderer/UniformType.h src/cpu/Chip8.cpp src/cpu/Chip8.h src/loaders/RomLoader.cpp src/loaders/RomLoader.h src/renderer/Renderer.cpp src/renderer/Renderer.h src/gui/Gui.cpp src/gui/Gui.h deps/imgui_memory_editor.h)
+    src/cpu/Chip8.cpp
+    src/cpu/Chip8.h
+    src/gui/Gui.cpp
+    src/gui/Gui.h
+    src/gui/widgets/Widget.h
+    src/loaders/RomLoader.cpp
+    src/loaders/RomLoader.h
+    src/loaders/ShaderLoader.cpp
+    src/loaders/ShaderLoader.h
+    src/renderer/Renderer.cpp
+    src/renderer/Renderer.h
+    src/renderer/Shader.cpp
+    src/renderer/Shader.h
+    src/renderer/UniformType.h src/gui/widgets/RegisterView.cpp src/gui/widgets/RegisterView.h src/gui/widgets/MemoryView.cpp src/gui/widgets/MemoryView.h src/gui/widgets/StackView.cpp src/gui/widgets/StackView.h src/gui/widgets/Widgets.h)
 
 target_link_libraries(chipbit PRIVATE
     glfw

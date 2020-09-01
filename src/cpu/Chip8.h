@@ -4,6 +4,7 @@
 #include <memory>
 #include <random>
 #include <iostream>
+#include <functional>
 
 namespace Chipbit {
   class Chip8 {
@@ -29,8 +30,9 @@ namespace Chipbit {
       unsigned char sound_timer = 0;
       unsigned char delay_timer = 0;
 
-      unsigned short PC = 0x200;
       unsigned short I = 0;
+      unsigned short PC = 0x200;
+
       std::vector<unsigned char> registers;
       std::vector<unsigned char> keys;
       std::vector<unsigned char> ram;

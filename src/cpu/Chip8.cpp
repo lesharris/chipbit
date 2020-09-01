@@ -55,6 +55,7 @@ bool Chipbit::Chip8::Tick() {
 
   if(m_CPU->waitForKeypress) {
     auto index = 0;
+
     for(auto k : m_CPU->keys) {
       if(k == 1) {
         m_CPU->waitForKeypress = false;
@@ -85,8 +86,12 @@ void Chipbit::Chip8::Opcode0000(unsigned short operand) {
       break;
 
     case 0x0EE:
-      m_CPU->sp--;
-      m_CPU->PC = m_CPU->stack[m_CPU->sp];
+      if(m_CPU->sp == 0) {
+        CB_ERROR("Stack underflow");
+      } else {
+        m_CPU->sp--;
+        m_CPU->PC = m_CPU->stack[m_CPU->sp];
+      }
       break;
 
     default:
@@ -100,7 +105,14 @@ void Chipbit::Chip8::Opcode1000(unsigned short operand) {
 }
 
 void Chipbit::Chip8::Opcode2000(unsigned short operand) {
-  m_CPU->stack[m_CPU->sp++] = m_CPU->PC;
+  m_CPU->stack[m_CPU->sp] = m_CPU->PC;
+
+  if(m_CPU->sp < 15) {
+    m_CPU->sp++;
+  } else {
+    CB_ERROR("Stack overflow");
+  }
+
   m_CPU->PC = operand;
 }
 
@@ -241,8 +253,7 @@ void Chipbit::Chip8::OpcodeD000(unsigned short operand) {
         if (curState == 1)
           V(0xF) = 1;
 
-        const int result = (curState ^= 1);
-        m_CPU->framebuffer[idx] = (result) ? m_OnColor : m_OffColor;
+        m_CPU->framebuffer[idx] = (curState ^ 1) ? m_OnColor : m_OffColor;
       }
     }
   }
@@ -299,7 +310,7 @@ void Chipbit::Chip8::OpcodeF000(unsigned short operand) {
       break;
 
     case 0x29:
-      m_CPU->I = 0x0 + (5 * V(X));
+      m_CPU->I = 5 * V(X);
       break;
 
     case 0x33:

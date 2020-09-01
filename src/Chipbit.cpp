@@ -11,7 +11,7 @@ void Chipbit::Chipbit::Initialize() {
 }
 
 void Chipbit::Chipbit::Run() {
-  auto rom = RomLoader::load("assets/roms/TETRIS");
+  auto rom = RomLoader::load("assets/roms/INVADERS");
   m_CPU->Load(rom, 0x200);
 
   while(!m_Window->ShouldClose()) {
