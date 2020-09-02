@@ -11,10 +11,27 @@ namespace Chipbit {
   public:
     struct CPU {
       CPU() {
+        Reset();
+      }
+
+      void Reset() {
         registers = std::vector<unsigned char>(16, 0);
         ram = std::vector<unsigned char>(4096, 0);
         framebuffer = std::vector<unsigned int>(128 * 64, 0);
         keys = std::vector<unsigned char>(16, 0);
+
+        sound_timer = 0;
+        delay_timer = 0;
+
+        draw = false;
+        waitForKeypress = false;
+
+        I = 0;
+        PC = 0x200;
+        SP = 0;
+
+        for(unsigned short & i : stack)
+          i = 0;
       }
 
       unsigned char GetRandom() {
@@ -38,7 +55,7 @@ namespace Chipbit {
       std::vector<unsigned char> ram;
       std::vector<unsigned int> framebuffer;
 
-      unsigned char sp = 0;
+      unsigned char SP = 0;
       unsigned short stack[16]{};
 
       std::random_device rd;

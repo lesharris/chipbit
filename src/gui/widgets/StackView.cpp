@@ -12,10 +12,10 @@ void Chipbit::StackView::Render(Chipbit::Chip8::CPU &cpu) {
   ImGui::PushFont(io.Fonts->Fonts[1]);
   static int selected = -1;
 
-  selected = cpu.sp;
+  selected = cpu.SP;
 
   for(auto i = 0; i < 16; i++) {
-    ImGui::Selectable(fmt::format("{0}{1:#02X}", (i == cpu.sp) ? "*" : " ", i).c_str(), i == cpu.sp, ImGuiSelectableFlags_SpanAllColumns);
+    ImGui::Selectable(fmt::format("{0}{1:#02X}", (i == cpu.SP) ? "*" : " ", i).c_str(), i == cpu.SP, ImGuiSelectableFlags_SpanAllColumns);
     ImGui::NextColumn();
 
     ImGui::Text("0x%04X", cpu.stack[i]); ImGui::NextColumn();

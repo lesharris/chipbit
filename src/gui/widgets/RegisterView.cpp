@@ -19,7 +19,7 @@ void Chipbit::RegisterView::Render(Chip8::CPU &cpu) {
   ImGui::Separator();
   ImGui::Text("0x%04X", cpu.PC); ImGui::NextColumn();
   ImGui::Text("0x%04X", cpu.I); ImGui::NextColumn();
-  ImGui::Text("0x%02X", cpu.sp); ImGui::NextColumn();
+  ImGui::Text("0x%02X", cpu.SP); ImGui::NextColumn();
   ImGui::Separator();
   ImGui::Columns(1);
   ImGui::Separator();

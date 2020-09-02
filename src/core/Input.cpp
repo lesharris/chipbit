@@ -19,6 +19,7 @@ Chipbit::Input::Input() {
   addMapping(GLFW_KEY_X, Action::K0, ActionSource::Keyboard);
   addMapping(GLFW_KEY_C, Action::KB, ActionSource::Keyboard);
   addMapping(GLFW_KEY_V, Action::KF, ActionSource::Keyboard);
+  addMapping(GLFW_KEY_ESCAPE, Action::Pause, ActionSource::Keyboard);
 }
 
 void Chipbit::Input::addMapping(int key, Action action, ActionSource source) {

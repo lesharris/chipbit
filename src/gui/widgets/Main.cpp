@@ -1,22 +1,39 @@
 #include "Main.h"
 
 #include "ImGuiFileDialog.h"
-#include "../../core/Log.h"
+
+#include "../../core/EventManager.h"
+
+
+Chipbit::Main::Main() {
+  EventManager::Get().Attach<
+      Events::PauseEvent,
+      &Main::HandlePausedEvent
+  >(this);
+}
 
 void Chipbit::Main::Render(Chipbit::Chip8::CPU &cpu) {
-  if(ImGui::BeginMainMenuBar()) {
+  if(m_Paused && ImGui::BeginMainMenuBar()) {
 
     if (ImGui::BeginMenu("File")) {
 
       if (ImGui::MenuItem("Open ROM...")) {
-        igfd::ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", "", ".");
+        igfd::ImGuiFileDialog::Instance()->OpenDialog("OpenRom", "Choose ROM...", "", ".");
       }
 
       ImGui::Separator();
 
       if (ImGui::MenuItem("Quit")) {
-        CB_INFO("Quit");
+        EventManager::Dispatcher().trigger<Events::QuitEvent>();
       }
+
+      ImGui::EndMenu();
+    }
+
+    if(ImGui::BeginMenu("Tools")) {
+      if(ImGui::MenuItem("View Registers")) {}
+      if(ImGui::MenuItem("View Stack")) {}
+      if(ImGui::MenuItem("View Memory")) {}
 
       ImGui::EndMenu();
     }
@@ -24,17 +41,17 @@ void Chipbit::Main::Render(Chipbit::Chip8::CPU &cpu) {
     ImGui::EndMainMenuBar();
   }
 
-  // display
-  if (igfd::ImGuiFileDialog::Instance()->FileDialog("ChooseFileDlgKey")) {
-    // action if OK
+  if (igfd::ImGuiFileDialog::Instance()->FileDialog("OpenRom")) {
     if (igfd::ImGuiFileDialog::Instance()->IsOk) {
       std::string filePathName = igfd::ImGuiFileDialog::Instance()->GetFilePathName();
-      std::string filePath = igfd::ImGuiFileDialog::Instance()->GetCurrentPath();
-      // action
-
-      CB_INFO("PathName: {0}, Path: {1}", filePathName, filePath);
+      EventManager::Dispatcher().trigger<Events::LoadRomEvent>(filePathName);
     }
-    // close
-    igfd::ImGuiFileDialog::Instance()->CloseDialog("ChooseFileDlgKey");
+
+
+    igfd::ImGuiFileDialog::Instance()->CloseDialog("OpenRom");
   }
+}
+
+void Chipbit::Main::HandlePausedEvent(const Events::PauseEvent& event) {
+  m_Paused = event.paused;
 }

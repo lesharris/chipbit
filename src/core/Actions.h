@@ -6,7 +6,8 @@ namespace Chipbit {
     K1, K2, K3, KC,
     K4, K5, K6, KD,
     K7, K8, K9, KE,
-    KA, K0, KB, KF
+    KA, K0, KB, KF,
+    Pause
   };
 
   inline std::map<Action, unsigned char> ActionToKey{

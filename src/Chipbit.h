@@ -7,6 +7,8 @@
 #include "renderer/Renderer.h"
 #include "gui/Gui.h"
 
+#include "core/events/Events.h"
+
 namespace Chipbit {
   class Chipbit {
   public:
@@ -20,10 +22,15 @@ namespace Chipbit {
     void Run();
 
     Window& GetWindow() { return *m_Window; }
+    Chip8::CPU& GetCPU() { return m_CPU->Get(); }
   private:
     Chipbit() = default;
     ~Chipbit() = default;
 
+    void HandleQuitEvent(const Events::QuitEvent& event);
+    void HandlePauseEvent(const Events::PauseEvent& event);
+    void HandleLoadRomEvent(const Events::LoadRomEvent& event);
+  private:
     std::shared_ptr<Window> m_Window;
     std::shared_ptr<Chip8> m_CPU;
     std::shared_ptr<Renderer> m_Renderer;
@@ -32,5 +39,8 @@ namespace Chipbit {
 
     double m_LastFrameTime = 0.0;
     double m_DeltaTime = 0.0;
+
+    bool m_SingleStepMode = false;
+    bool m_Paused = true;
   };
 }

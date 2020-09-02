@@ -101,6 +101,9 @@ Chipbit::Renderer::Renderer(const Chip8& cpu) {
     CB_ERROR("Could not generate framebuffer!");
   }
 
+  glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
   EventManager::Get().Attach<
@@ -139,8 +142,10 @@ void Chipbit::Renderer::Render() {
 }
 
 void Chipbit::Renderer::HandleScreenResize(const Events::WindowResizedEvent &event) const {
+  auto& cpu = Chipbit::Get().GetCPU();
   auto& window = Chipbit::Get().GetWindow();
   auto screenScale = window.GetScale();
+
 
   glBindTexture(GL_TEXTURE_2D, m_ScreenTexture);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
@@ -149,4 +154,11 @@ void Chipbit::Renderer::HandleScreenResize(const Events::WindowResizedEvent &eve
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glBindTexture(GL_TEXTURE_2D, 0);
+
+  glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+
+  glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

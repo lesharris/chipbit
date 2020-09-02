@@ -9,9 +9,13 @@ namespace Chipbit::Events {
     int height;
   };
 
-  struct ScreenUpdateEvent {
-    explicit ScreenUpdateEvent(std::vector<unsigned short> fb) : framebuffer(std::move(fb)) {}
+  struct QuitEvent {};
 
-    std::vector<unsigned short> framebuffer;
+  struct PauseEvent {
+    bool paused;
+  };
+
+  struct LoadRomEvent {
+    std::string rom;
   };
 }

@@ -86,11 +86,11 @@ void Chipbit::Chip8::Opcode0000(unsigned short operand) {
       break;
 
     case 0x0EE:
-      if(m_CPU->sp == 0) {
+      if(m_CPU->SP == 0) {
         CB_ERROR("Stack underflow");
       } else {
-        m_CPU->sp--;
-        m_CPU->PC = m_CPU->stack[m_CPU->sp];
+        m_CPU->SP--;
+        m_CPU->PC = m_CPU->stack[m_CPU->SP];
       }
       break;
 
@@ -105,10 +105,10 @@ void Chipbit::Chip8::Opcode1000(unsigned short operand) {
 }
 
 void Chipbit::Chip8::Opcode2000(unsigned short operand) {
-  m_CPU->stack[m_CPU->sp] = m_CPU->PC;
+  m_CPU->stack[m_CPU->SP] = m_CPU->PC;
 
-  if(m_CPU->sp < 15) {
-    m_CPU->sp++;
+  if(m_CPU->SP < 15) {
+    m_CPU->SP++;
   } else {
     CB_ERROR("Stack overflow");
   }
