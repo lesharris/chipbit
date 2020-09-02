@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "../core/events/Events.h"
+#include "../core/EventManager.h"
 #include "../core/Log.h"
 
 #define V(R)  m_CPU->registers[R]
@@ -28,6 +30,25 @@ Chipbit::Chip8::Chip8() {
       0xF0, 0x80, 0xF0, 0x80, 0x80  // F
   };
 
+  m_BigFont = {
+      0x7C, 0x82, 0x82, 0x82, 0x82, 0x82, 0x82, 0x82, 0x7C, 0x00, // 0
+      0x08, 0x18, 0x38, 0x08, 0x08, 0x08, 0x08, 0x08, 0x3C, 0x00, // 1
+      0x7C, 0x82, 0x02, 0x02, 0x04, 0x18, 0x20, 0x40, 0xFE, 0x00, // 2
+      0x7C, 0x82, 0x02, 0x02, 0x3C, 0x02, 0x02, 0x82, 0x7C, 0x00, // 3
+      0x84, 0x84, 0x84, 0x84, 0xFE, 0x04, 0x04, 0x04, 0x04, 0x00, // 4
+      0xFE, 0x80, 0x80, 0x80, 0xFC, 0x02, 0x02, 0x82, 0x7C, 0x00, // 5
+      0x7C, 0x82, 0x80, 0x80, 0xFC, 0x82, 0x82, 0x82, 0x7C, 0x00, // 6
+      0xFE, 0x02, 0x04, 0x08, 0x10, 0x20, 0x20, 0x20, 0x20, 0x00, // 7
+      0x7C, 0x82, 0x82, 0x82, 0x7C, 0x82, 0x82, 0x82, 0x7C, 0x00, // 8
+      0x7C, 0x82, 0x82, 0x82, 0x7E, 0x02, 0x02, 0x82, 0x7C, 0x00, // 9
+      0x10, 0x28, 0x44, 0x82, 0x82, 0xFE, 0x82, 0x82, 0x82, 0x00, // A
+      0xFC, 0x82, 0x82, 0x82, 0xFC, 0x82, 0x82, 0x82, 0xFC, 0x00, // B
+      0x7C, 0x82, 0x80, 0x80, 0x80, 0x80, 0x80, 0x82, 0x7C, 0x00, // C
+      0xFC, 0x82, 0x82, 0x82, 0x82, 0x82, 0x82, 0x82, 0xFC, 0x00, // D
+      0xFE, 0x80, 0x80, 0x80, 0xF8, 0x80, 0x80, 0x80, 0xFE, 0x00, // E
+      0xFE, 0x80, 0x80, 0x80, 0xF8, 0x80, 0x80, 0x80, 0x80, 0x00, // F
+  };
+
 
   m_Vectors = {
       OPCODE(0000), OPCODE(1000), OPCODE(2000), OPCODE(3000),
@@ -37,34 +58,35 @@ Chipbit::Chip8::Chip8() {
   };
 
   std::copy(m_Font.begin(), m_Font.end(), m_CPU->ram.begin());
+  std::copy(m_BigFont.begin(), m_BigFont.end(), m_CPU->ram.begin() + m_Font.size());
 
   //m_OnColor = Color(255, 255, 255, 255);
- // m_OffColor = Color(33, 33, 33,255);
+  // m_OffColor = Color(33, 33, 33,255);
 
   m_OnColor = Color(183, 109, 104, 255);
   m_OffColor = Color(27, 36, 50, 255);
 
-  m_CPU->framebuffer = std::vector<unsigned int>(64 * 32, m_OffColor);
+  m_CPU->framebuffer = std::vector<unsigned int>(128 * 64, m_OffColor);
 }
 
 bool Chipbit::Chip8::Tick() {
-  if(m_CPU->PC >= 4096) {
+  if (m_CPU->PC >= 4096) {
     m_CPU->PC = 0x200;
     CB_WARN("Program Counter overflow");
   }
 
-  if(m_CPU->waitForKeypress) {
+  if (m_CPU->waitForKeypress) {
     auto index = 0;
 
-    for(auto k : m_CPU->keys) {
-      if(k == 1) {
+    for (auto k : m_CPU->keys) {
+      if (k == 1) {
         m_CPU->waitForKeypress = false;
         break;
       }
       index++;
     }
 
-    if(m_CPU->waitForKeypress)
+    if (m_CPU->waitForKeypress)
       return false;
 
     V(m_CPU->keypressResultReg) = index;
@@ -79,18 +101,66 @@ bool Chipbit::Chip8::Tick() {
 }
 
 void Chipbit::Chip8::Opcode0000(unsigned short operand) {
-  switch(operand) {
-    case 0x0E0:
-      m_CPU->framebuffer = std::vector<unsigned int>(64 * 32, m_OffColor);
+  switch ((operand & 0x0F0) >> 4) {
+    case 0xC: {
+      auto count = operand & 0x00F;
+      ScrollDown(count);
       m_CPU->draw = true;
+    }
       break;
 
-    case 0x0EE:
-      if(m_CPU->SP == 0) {
-        CB_ERROR("Stack underflow");
-      } else {
-        m_CPU->SP--;
-        m_CPU->PC = m_CPU->stack[m_CPU->SP];
+    case 0xE:
+      switch (operand) {
+        case 0x0E0:
+          m_CPU->framebuffer = std::vector<unsigned int>(128 * 64, m_OffColor);
+          m_CPU->draw = true;
+          break;
+
+        case 0x0EE:
+          if (m_CPU->SP == 0) {
+            CB_ERROR("Stack underflow");
+          } else {
+            m_CPU->SP--;
+            m_CPU->PC = m_CPU->stack[m_CPU->SP];
+          }
+          break;
+
+        default:
+          CB_WARN("Invalid 0x00E0 Opcode: {:#04x}", operand);
+          break;
+      }
+      break;
+
+    case 0xF:
+      switch (operand) {
+        case 0x0FB:
+          ScrollRight(4);
+          m_CPU->draw = true;
+          break;
+
+        case 0x0FC:
+          ScrollLeft(4);
+          m_CPU->draw = true;
+          break;
+
+        case 0x0FD:
+          CB_INFO("Exit");
+          EventManager::Dispatcher().trigger<Events::PauseEvent>();
+          break;
+
+        case 0x0FE:
+          CB_INFO("Lores On");
+          m_CPU->hires = false;
+          break;
+
+        case 0x0FF:
+          CB_INFO("Hires On");
+          m_CPU->hires = true;
+          break;
+
+        default:
+          CB_WARN("Invalid 0x00F0 Opcode: {:#04x}", operand);
+          break;
       }
       break;
 
@@ -107,7 +177,7 @@ void Chipbit::Chip8::Opcode1000(unsigned short operand) {
 void Chipbit::Chip8::Opcode2000(unsigned short operand) {
   m_CPU->stack[m_CPU->SP] = m_CPU->PC;
 
-  if(m_CPU->SP < 15) {
+  if (m_CPU->SP < 15) {
     m_CPU->SP++;
   } else {
     CB_ERROR("Stack overflow");
@@ -120,7 +190,7 @@ void Chipbit::Chip8::Opcode3000(unsigned short operand) {
   unsigned char X = (operand & 0xF00) >> 8;
   unsigned char val = operand & 0x0FF;
 
-  if(V(X) == val) {
+  if (V(X) == val) {
     m_CPU->PC += 2;
   }
 }
@@ -129,7 +199,7 @@ void Chipbit::Chip8::Opcode4000(unsigned short operand) {
   unsigned char X = (operand & 0xF00) >> 8;
   unsigned char val = operand & 0x0FF;
 
-  if(V(X) != val) {
+  if (V(X) != val) {
     m_CPU->PC += 2;
   }
 }
@@ -138,7 +208,7 @@ void Chipbit::Chip8::Opcode5000(unsigned short operand) {
   unsigned char X = (operand & 0xF00) >> 8;
   unsigned char Y = (operand & 0x0F0) >> 4;
 
-  if(V(X) == V(Y)) {
+  if (V(X) == V(Y)) {
     m_CPU->PC += 2;
   }
 }
@@ -161,7 +231,7 @@ void Chipbit::Chip8::Opcode8000(unsigned short operand) {
   unsigned char X = (operand & 0xF00) >> 8;
   unsigned char Y = (operand & 0x0F0) >> 4;
 
-  switch(operand & 0x00F) {
+  switch (operand & 0x00F) {
     case 0x0:
       V(X) = V(Y);
       break;
@@ -215,7 +285,7 @@ void Chipbit::Chip8::Opcode9000(unsigned short operand) {
   unsigned char X = (operand & 0xF00) >> 8;
   unsigned char Y = (operand & 0x0F0) >> 4;
 
-  if(V(X) != V(Y)) {
+  if (V(X) != V(Y)) {
     m_CPU->PC += 2;
   }
 }
@@ -242,18 +312,53 @@ void Chipbit::Chip8::OpcodeD000(unsigned short operand) {
 
   V(0xF) = 0;
 
-  for(auto h = 0; h < height; h++) {
-    unsigned char sprite = m_CPU->ram[m_CPU->I + h];
+  auto scale = m_CPU->hires ? 1 : 2;
 
-    for(auto w = 0; w < 8; w++) {
-      if ((sprite & (0x80 >> w)) != 0) {
-        const int idx = (V(X) + w + ((V(Y) + h) * 64));
+  if (height == 0) {
+    for (auto h = 0; h < 16; h++) {
+      unsigned short spriteRow = m_CPU->ram[m_CPU->I + 2 * h] << 8 | m_CPU->ram[m_CPU->I + 2 * h + 1];
+      for (auto w = 0; w < 16; w++) {
+        int pixel = (spriteRow >> (15 - w)) & 1;
 
-        int curState = (m_CPU->framebuffer[idx] == m_OnColor);
-        if (curState == 1)
-          V(0xF) = 1;
+        const int index = ((V(Y) + h) * 128) + V(X) + w;
+        auto currentState = (m_CPU->framebuffer[index] == m_OnColor);
 
-        m_CPU->framebuffer[idx] = (curState ^ 1) ? m_OnColor : m_OffColor;
+        V(0xF) |= currentState & pixel;
+        m_CPU->framebuffer[index] = (currentState ^ pixel) ? m_OnColor : m_OffColor;
+      }
+    }
+  } else {
+    for (auto h = 0; h < height; h++) {
+      for (auto w = 0; w < 8; w++) {
+        int pixel = (m_CPU->ram[m_CPU->I + h] >> (7 - w)) & 1;
+
+        const int xw = (V(X) * scale) + w * scale % (64 * scale);
+        const int yh = (V(Y) * scale) + h * scale % (32 * scale);
+
+        if (!m_CPU->hires) {
+          const int indexTL = (yh * 128) + xw;
+          const int indexTR = (yh * 128) + xw + 1;
+          const int indexBL = ((yh + 1) * 128) + xw;
+          const int indexBR = ((yh + 1) * 128) + xw + 1;
+
+          auto currentState = (m_CPU->framebuffer[indexTL] == m_OnColor);
+
+          V(0xF) |= currentState & pixel;
+
+          auto color = (currentState ^ pixel) ? m_OnColor : m_OffColor;
+
+          m_CPU->framebuffer[indexTL] = color;
+          m_CPU->framebuffer[indexTR] = color;
+          m_CPU->framebuffer[indexBL] = color;
+          m_CPU->framebuffer[indexBR] = color;
+        } else {
+          const int index = (yh * 128) + xw;
+          auto currentState = (m_CPU->framebuffer[index] == m_OnColor);
+
+          V(0xF) |= currentState & pixel;
+
+          m_CPU->framebuffer[index] = (currentState ^ pixel) ? m_OnColor : m_OffColor;
+        }
       }
     }
   }
@@ -265,14 +370,14 @@ void Chipbit::Chip8::OpcodeE000(unsigned short operand) {
   unsigned char X = (operand & 0xF00) >> 8;
   unsigned char operation = operand & 0x0FF;
 
-  switch(operation) {
+  switch (operation) {
     case 0x9E:
-      if(m_CPU->keys[V(X)] == 1)
+      if (m_CPU->keys[V(X)] == 1)
         m_CPU->PC += 2;
       break;
 
     case 0xA1:
-      if(m_CPU->keys[V(X)] == 0)
+      if (m_CPU->keys[V(X)] == 0)
         m_CPU->PC += 2;
       break;
 
@@ -286,7 +391,7 @@ void Chipbit::Chip8::OpcodeF000(unsigned short operand) {
   unsigned char X = (operand & 0xF00) >> 8;
   unsigned char operation = operand & 0x0FF;
 
-  switch(operation) {
+  switch (operation) {
     case 0x7:
       V(X) = m_CPU->delay_timer;
       break;
@@ -305,12 +410,16 @@ void Chipbit::Chip8::OpcodeF000(unsigned short operand) {
       break;
 
     case 0x1E:
-     // V(0xF) = (m_CPU->I + (unsigned short)V(X)) > 0xFFF;
+      // V(0xF) = (m_CPU->I + (unsigned short)V(X)) > 0xFFF;
       m_CPU->I += V(X);
       break;
 
     case 0x29:
       m_CPU->I = 5 * V(X);
+      break;
+
+    case 0x30:
+      m_CPU->I = m_Font.size() + (10 * V(X));
       break;
 
     case 0x33:
@@ -320,12 +429,12 @@ void Chipbit::Chip8::OpcodeF000(unsigned short operand) {
       break;
 
     case 0x55:
-      for(int i = 0; i <= X; i++)
+      for (int i = 0; i <= X; i++)
         m_CPU->ram[m_CPU->I + i] = V(i);
       break;
 
     case 0x65:
-      for(int i = 0; i <= X; i++)
+      for (int i = 0; i <= X; i++)
         V(i) = m_CPU->ram[m_CPU->I + i];
       break;
 
@@ -336,7 +445,7 @@ void Chipbit::Chip8::OpcodeF000(unsigned short operand) {
 }
 
 void Chipbit::Chip8::Load(const std::vector<unsigned char> &data, int address) {
-  if(address >= 4096) {
+  if (address >= 4096) {
     return;
   }
 
@@ -345,6 +454,67 @@ void Chipbit::Chip8::Load(const std::vector<unsigned char> &data, int address) {
 
 unsigned int Chipbit::Chip8::Color(unsigned int r, unsigned int g, unsigned int b, unsigned int a) {
   return r << 24 | g << 16 | b << 8 | a;
+}
+
+void Chipbit::Chip8::CopyRow(int source, int destination) {
+  std::copy_n(m_CPU->framebuffer.cbegin() + source * 128, 128, m_CPU->framebuffer.begin() + destination * 128);
+}
+
+void Chipbit::Chip8::CopyColumn(int source, int destination) {
+  for (int y = 0; y < 64; ++y) {
+    auto rowOffset = y * 128;
+    m_CPU->framebuffer[destination + rowOffset] = m_CPU->framebuffer[source + rowOffset];
+  }
+}
+
+void Chipbit::Chip8::ScrollDown(int count) {
+  for (int y = 64 - count - 1; y >= 0; --y) {
+    CopyRow(y, y + count);
+  }
+
+  for (int y = 0; y < count; ++y) {
+    ClearRow(y);
+  }
+}
+
+void Chipbit::Chip8::ClearRow(int row) {
+  std::fill_n(m_CPU->framebuffer.begin() + row * 128, 128, m_OffColor);
+}
+
+void Chipbit::Chip8::ClearColumn(int column) {
+  for (int y = 0; y < 64; ++y) {
+    m_CPU->framebuffer[column + (y * 128)] = m_OffColor;
+  }
+}
+
+void Chipbit::Chip8::ScrollUp(int count) {
+  for (int y = 0; y < (64 - count); ++y) {
+    CopyRow(y + count, y);
+  }
+
+  for (int y = 0; y < count; ++y) {
+    ClearRow(64 - y - 1);
+  }
+}
+
+void Chipbit::Chip8::ScrollLeft(int count) {
+  for (int x = 0; x < (128 - count); ++x) {
+    CopyColumn(x + count, x);
+  }
+
+  for (int x = 0; x < count; ++x) {
+    ClearColumn(128 - x - 1);
+  }
+}
+
+void Chipbit::Chip8::ScrollRight(int count) {
+  for (int x = 128 - count - 1; x >= 0; --x) {
+    CopyColumn(x, x + count);
+  }
+
+  for (int x = 0; x < count; ++x) {
+    ClearColumn(x);
+  }
 }
 
 

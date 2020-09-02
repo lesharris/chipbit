@@ -32,6 +32,8 @@ namespace Chipbit {
 
         for(unsigned short & i : stack)
           i = 0;
+
+        hires = false;
       }
 
       unsigned char GetRandom() {
@@ -60,6 +62,8 @@ namespace Chipbit {
 
       std::random_device rd;
       std::mt19937 mt{rd()};
+
+      bool hires = false;
     };
 
   public:
@@ -101,8 +105,20 @@ namespace Chipbit {
     void OpcodeF000(unsigned short operand);
 
     static unsigned int Color(unsigned int r, unsigned int g, unsigned int b, unsigned int a);
+
+    void ClearRow(int row);
+    void ClearColumn(int column);
+    void CopyRow(int source, int destination);
+    void CopyColumn(int source, int destination);
+
+    void ScrollUp(int count);
+    void ScrollDown(int count);
+    void ScrollLeft(int count);
+    void ScrollRight(int count);
+
   private:
     std::vector<unsigned char> m_Font;
+    std::vector<unsigned char> m_BigFont;
     std::vector<std::function<void(unsigned short)>> m_Vectors;
     std::shared_ptr<CPU> m_CPU;
 

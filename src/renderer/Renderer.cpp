@@ -120,7 +120,7 @@ void Chipbit::Renderer::Draw(const std::vector<unsigned int>& fb) {
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, m_C8Texture);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 64, 32, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, fb.data());
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 128, 64, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, fb.data());
 
   m_C8Shader->use();
 
