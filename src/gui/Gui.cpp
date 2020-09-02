@@ -23,9 +23,11 @@ Chipbit::Gui::Gui() {
 
   SetImGuiStyle();
 
+  m_Widgets.push_back(std::make_shared<Main>());
   m_Widgets.push_back(std::make_shared<RegisterView>());
   m_Widgets.push_back(std::make_shared<MemoryView>());
   m_Widgets.push_back(std::make_shared<StackView>());
+  m_Widgets.push_back(std::make_shared<CodeEditor>());
 }
 
 void Chipbit::Gui::BeginFrame() {

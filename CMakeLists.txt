@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 if (WIN32)
   set(CMAKE_PREFIX_PATH C:/lib)
+  include_directories(deps/dirent/include)
 endif ()
 
 add_subdirectory(deps/spdlog)
@@ -51,7 +52,19 @@ add_executable(chipbit src/main.cpp
     src/renderer/Renderer.h
     src/renderer/Shader.cpp
     src/renderer/Shader.h
-    src/renderer/UniformType.h src/gui/widgets/RegisterView.cpp src/gui/widgets/RegisterView.h src/gui/widgets/MemoryView.cpp src/gui/widgets/MemoryView.h src/gui/widgets/StackView.cpp src/gui/widgets/StackView.h src/gui/widgets/Widgets.h)
+    src/renderer/UniformType.h
+    src/gui/widgets/RegisterView.cpp
+    src/gui/widgets/RegisterView.h
+    src/gui/widgets/MemoryView.cpp
+    src/gui/widgets/MemoryView.h
+    src/gui/widgets/StackView.cpp
+    src/gui/widgets/StackView.h
+    src/gui/widgets/Widgets.h
+    deps/TextEditor.cpp
+    deps/TextEditor.h
+    src/gui/widgets/CodeEditor.cpp
+    src/gui/widgets/CodeEditor.h
+    deps/ImGuiFileDialog.cpp src/gui/widgets/Main.cpp src/gui/widgets/Main.h)
 
 target_link_libraries(chipbit PRIVATE
     glfw
