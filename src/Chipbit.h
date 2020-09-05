@@ -42,5 +42,6 @@ namespace Chipbit {
 
     bool m_SingleStepMode = false;
     bool m_Paused = true;
+    bool m_PauseLastFrame = false;
   };
 }

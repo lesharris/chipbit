@@ -1233,7 +1233,7 @@ namespace igfd
 		std::string result = FileNameBuffer;
 
 		// if not a collection we can replace the filter by thee extention we want
-		if (m_SelectedFilter.collectionfilters.empty())
+	/*	if (m_SelectedFilter.collectionfilters.empty())
 		{
 			size_t lastPoint = result.find_last_of('.');
 			if (lastPoint != std::string::npos)
@@ -1242,7 +1242,7 @@ namespace igfd
 			}
 
 			result += m_SelectedFilter.filter;
-		}
+		}*/
 
 		return result;
 	}

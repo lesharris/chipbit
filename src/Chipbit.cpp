@@ -35,34 +35,44 @@ void Chipbit::Chipbit::Run() {
 
     m_Window->BeginFrame();
 
+    {
+      std::vector<unsigned char> keyBuf(16, 0);
+      auto keys = m_Input->poll();
+      bool pauseHit = false;
+      std::for_each(keys.begin(), keys.end(), [&](Action action) {
+        pauseHit = false;
+
+        switch(action) {
+          case Action::Pause:
+            pauseHit = true;
+            if(!m_PauseLastFrame) {
+              m_Paused = !m_Paused;
+              EventManager::Dispatcher().trigger<Events::PauseEvent>(m_Paused);
+            }
+            break;
+
+          default:
+            if(!m_Paused)
+              keyBuf[ActionToKey[action]] = 1;
+            break;
+        }
+      });
+
+      m_PauseLastFrame = pauseHit;
+
+      if(!m_Paused)
+        m_CPU->SetKeys(keyBuf);
+    }
+
     if(!m_Paused) {
       {
-        {
-          std::vector<unsigned char> keyBuf(16, 0);
-          auto keys = m_Input->poll();
-
-          std::for_each(keys.begin(), keys.end(), [&](Action action) {
-            switch(action) {
-              case Action::Pause:
-                EventManager::Dispatcher().trigger<Events::PauseEvent>(true);
-                break;
-
-              default:
-                keyBuf[ActionToKey[action]] = 1;
-                break;
-            }
-          });
-
-          m_CPU->SetKeys(keyBuf);
-        }
-
         // Tick timers at 60hz
         while (m_DeltaTime >= 1.0) {
           m_CPU->TickTimers();
           m_DeltaTime--;
         }
 
-        for (auto i = 0; i < 8; i++)
+        for (auto i = 0; i < 20; i++)
           m_CPU->Tick();
 
         // Update Framebuffer texture

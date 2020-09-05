@@ -4,7 +4,6 @@
 
 #include "../../core/EventManager.h"
 
-
 Chipbit::Main::Main() {
   EventManager::Get().Attach<
       Events::PauseEvent,
@@ -18,7 +17,7 @@ void Chipbit::Main::Render(Chipbit::Chip8::CPU &cpu) {
     if (ImGui::BeginMenu("File")) {
 
       if (ImGui::MenuItem("Open ROM...")) {
-        igfd::ImGuiFileDialog::Instance()->OpenDialog("OpenRom", "Choose ROM...", "", ".");
+        igfd::ImGuiFileDialog::Instance()->OpenDialog("OpenRom", "Choose ROM...", ".*", ".");
       }
 
       ImGui::Separator();
