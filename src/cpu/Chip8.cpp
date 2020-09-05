@@ -310,57 +310,34 @@ void Chipbit::Chip8::OpcodeD000(unsigned short operand) {
   unsigned char Y = (operand & 0x0F0) >> 4;
   unsigned char height = operand & 0x00F;
 
-  V(0xF) = 0;
-
   auto scale = m_CPU->hires ? 1 : 2;
 
-  if (height == 0) {
-    for (auto h = 0; h < 16; h++) {
-      unsigned short spriteRow = m_CPU->ram[m_CPU->I + 2 * h] << 8 | m_CPU->ram[m_CPU->I + 2 * h + 1];
-      for (auto w = 0; w < 16; w++) {
-        int pixel = (spriteRow >> (15 - w)) & 1;
+  switch (height) {
+    case 0x0:
+      for (auto h = 0; h < 16; h++) {
+        unsigned short spriteRow = m_CPU->ram[m_CPU->I + 2 * h] << 8 | m_CPU->ram[m_CPU->I + 2 * h + 1];
+        for (auto w = 0; w < 16; w++) {
+          const int pixel = (spriteRow >> (15 - w)) & 1;
+          int xw = V(X) + w;
+          int yh = V(Y) + h;
 
-        const int index = ((V(Y) + h) * 128) + V(X) + w;
-        auto currentState = (m_CPU->framebuffer[index] == m_OnColor);
-
-        V(0xF) |= currentState & pixel;
-        m_CPU->framebuffer[index] = (currentState ^ pixel) ? m_OnColor : m_OffColor;
-      }
-    }
-  } else {
-    for (auto h = 0; h < height; h++) {
-      for (auto w = 0; w < 8; w++) {
-        int pixel = (m_CPU->ram[m_CPU->I + h] >> (7 - w)) & 1;
-
-        const int xw = (V(X) * scale) + w * scale % (64 * scale);
-        const int yh = (V(Y) * scale) + h * scale % (32 * scale);
-
-        if (!m_CPU->hires) {
-          const int indexTL = (yh * 128) + xw;
-          const int indexTR = (yh * 128) + xw + 1;
-          const int indexBL = ((yh + 1) * 128) + xw;
-          const int indexBR = ((yh + 1) * 128) + xw + 1;
-
-          auto currentState = (m_CPU->framebuffer[indexTL] == m_OnColor);
-
-          V(0xF) |= currentState & pixel;
-
-          auto color = (currentState ^ pixel) ? m_OnColor : m_OffColor;
-
-          m_CPU->framebuffer[indexTL] = color;
-          m_CPU->framebuffer[indexTR] = color;
-          m_CPU->framebuffer[indexBL] = color;
-          m_CPU->framebuffer[indexBR] = color;
-        } else {
-          const int index = (yh * 128) + xw;
-          auto currentState = (m_CPU->framebuffer[index] == m_OnColor);
-
-          V(0xF) |= currentState & pixel;
-
-          m_CPU->framebuffer[index] = (currentState ^ pixel) ? m_OnColor : m_OffColor;
+          SetPixel(xw, yh, pixel);
         }
       }
-    }
+      break;
+
+    default:
+      for (auto h = 0; h < height; h++) {
+        for (auto w = 0; w < 8; w++) {
+          int pixel = (m_CPU->ram[m_CPU->I + h] >> (7 - w)) & 1;
+
+          const int xw = (V(X) * scale) + w * scale % (64 * scale);
+          const int yh = (V(Y) * scale) + h * scale % (32 * scale);
+
+          SetPixel(xw, yh, pixel);
+        }
+      }
+      break;
   }
 
   m_CPU->draw = true;
@@ -514,6 +491,41 @@ void Chipbit::Chip8::ScrollRight(int count) {
 
   for (int x = 0; x < count; ++x) {
     ClearColumn(x);
+  }
+}
+
+void Chipbit::Chip8::SetPixel(int x, int y, int currentPixel) {
+  V(0xF) = 0;
+
+  x %= 128;
+  y %= 64;
+
+  const int indexTL = (y * 128) + x;
+  int indexTR = (y * 128) + x + 1;
+  int indexBL = ((y + 1) * 128) + x;
+  int indexBR = ((y + 1) * 128) + x + 1;
+
+  if(indexTR >= m_CPU->framebuffer.size())
+    indexTR = indexTL;
+
+  if(indexBL >= m_CPU->framebuffer.size())
+    indexBL = indexTL;
+
+  if(indexBR >= m_CPU->framebuffer.size())
+    indexBR = indexTL;
+
+  auto currentState = (m_CPU->framebuffer[indexTL] == m_OnColor);
+
+  V(0xF) |= currentState & currentPixel;
+  auto color = (currentState ^ currentPixel) ? m_OnColor : m_OffColor;
+
+  if (!m_CPU->hires) {
+    m_CPU->framebuffer[indexTL] = color;
+    m_CPU->framebuffer[indexTR] = color;
+    m_CPU->framebuffer[indexBL] = color;
+    m_CPU->framebuffer[indexBR] = color;
+  } else {
+    m_CPU->framebuffer[indexTL] = color;
   }
 }
 

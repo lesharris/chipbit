@@ -116,6 +116,8 @@ namespace Chipbit {
     void ScrollLeft(int count);
     void ScrollRight(int count);
 
+    void SetPixel(int x, int y, int currentPixel);
+
   private:
     std::vector<unsigned char> m_Font;
     std::vector<unsigned char> m_BigFont;
