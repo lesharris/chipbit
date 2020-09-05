@@ -17,7 +17,6 @@ namespace Chipbit {
       void Reset() {
         registers = std::vector<unsigned char>(16, 0);
         ram = std::vector<unsigned char>(4096, 0);
-        framebuffer = std::vector<unsigned int>(128 * 64, 0);
         keys = std::vector<unsigned char>(16, 0);
 
         sound_timer = 0;
@@ -82,6 +81,11 @@ namespace Chipbit {
       if(m_CPU->sound_timer != 0)
         m_CPU->sound_timer--;
     }
+    void Reset() {
+      m_CPU->Reset();
+      LoadFonts();
+      m_CPU->framebuffer = std::vector<unsigned int>(128 * 64, m_OffColor);
+    }
 
     CPU& Get() { return *m_CPU; }
     [[nodiscard]] std::vector<unsigned int> Framebuffer() const { return m_CPU->framebuffer; }
@@ -116,7 +120,9 @@ namespace Chipbit {
     void ScrollLeft(int count);
     void ScrollRight(int count);
 
-    void SetPixel(int x, int y, int currentPixel);
+    bool SetPixel(int x, int y, int currentPixel);
+
+    void LoadFonts();
 
   private:
     std::vector<unsigned char> m_Font;

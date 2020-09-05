@@ -25,6 +25,16 @@ void Chipbit::Chipbit::Initialize() {
       Events::LoadRomEvent,
       &Chipbit::HandleLoadRomEvent
   >(this);
+
+  EventManager::Get().Attach<
+      Events::UpdateTPFEvent,
+      &Chipbit::HandleUpdateTPFEvent
+  >(this);
+
+  EventManager::Get().Attach<
+      Events::ResetEvent,
+      &Chipbit::HandleResetEvent
+  >(this);
 }
 
 void Chipbit::Chipbit::Run() {
@@ -72,7 +82,7 @@ void Chipbit::Chipbit::Run() {
           m_DeltaTime--;
         }
 
-        for (auto i = 0; i < 20; i++)
+        for (auto i = 0; i < m_TicksPerFrame; i++)
           m_CPU->Tick();
 
         // Update Framebuffer texture
@@ -102,9 +112,20 @@ void Chipbit::Chipbit::HandleQuitEvent(const Events::QuitEvent& event) {
 
 void Chipbit::Chipbit::HandleLoadRomEvent(const Events::LoadRomEvent &event) {
   auto rom = RomLoader::load(event.rom);
-  m_CPU->Get().Reset();
+  m_CPU->Reset();
   m_CPU->Load(rom, 0x200);
 
+  EventManager::Dispatcher().trigger<Events::PauseEvent>(false);
+}
+
+void Chipbit::Chipbit::HandleUpdateTPFEvent(const Events::UpdateTPFEvent &event) {
+  m_TicksPerFrame = event.ticksPerFrame;
+}
+
+void Chipbit::Chipbit::HandleResetEvent(const Events::ResetEvent &event) {
+  auto ram = m_CPU->Get().ram;
+  m_CPU->Reset();
+  m_CPU->Get().ram = ram;
   EventManager::Dispatcher().trigger<Events::PauseEvent>(false);
 }
 

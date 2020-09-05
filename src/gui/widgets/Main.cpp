@@ -22,6 +22,12 @@ void Chipbit::Main::Render(Chipbit::Chip8::CPU &cpu) {
 
       ImGui::Separator();
 
+      if(ImGui::MenuItem("Reset")) {
+        EventManager::Dispatcher().trigger<Events::ResetEvent>();
+      }
+
+      ImGui::Separator();
+
       if (ImGui::MenuItem("Quit")) {
         EventManager::Dispatcher().trigger<Events::QuitEvent>();
       }
@@ -34,6 +40,43 @@ void Chipbit::Main::Render(Chipbit::Chip8::CPU &cpu) {
       if(ImGui::MenuItem("View Stack")) {}
       if(ImGui::MenuItem("View Memory")) {}
 
+      ImGui::EndMenu();
+    }
+
+    if(ImGui::BeginMenu("Speed")) {
+      static unsigned int selected = 20;
+      if(ImGui::MenuItem("7 ticks/frame", nullptr, selected == 7)) {
+        selected = 7;
+        EventManager::Dispatcher().trigger<Events::UpdateTPFEvent>(7u);
+      }
+      if(ImGui::MenuItem("15 ticks/frame", nullptr, selected == 15)) {
+        selected = 15;
+        EventManager::Dispatcher().trigger<Events::UpdateTPFEvent>(15u);
+      }
+      if(ImGui::MenuItem("20 ticks/frame", nullptr, selected == 20)) {
+        selected = 20;
+        EventManager::Dispatcher().trigger<Events::UpdateTPFEvent>(20u);
+      }
+      if(ImGui::MenuItem("30 ticks/frame", nullptr, selected == 30)) {
+        selected = 30;
+        EventManager::Dispatcher().trigger<Events::UpdateTPFEvent>(30u);
+      }
+      if(ImGui::MenuItem("100 ticks/frame", nullptr, selected == 100)) {
+        selected = 100;
+        EventManager::Dispatcher().trigger<Events::UpdateTPFEvent>(100u);
+      }
+      if(ImGui::MenuItem("200 ticks/frame", nullptr, selected == 200)) {
+        selected = 200;
+        EventManager::Dispatcher().trigger<Events::UpdateTPFEvent>(200u);
+      }
+      if(ImGui::MenuItem("500 ticks/frame", nullptr, selected == 500)) {
+        selected = 500;
+        EventManager::Dispatcher().trigger<Events::UpdateTPFEvent>(500u);
+      }
+      if(ImGui::MenuItem("1000 ticks/frame", nullptr, selected == 1000)) {
+        selected = 1000;
+        EventManager::Dispatcher().trigger<Events::UpdateTPFEvent>(1000u);
+      }
       ImGui::EndMenu();
     }
 

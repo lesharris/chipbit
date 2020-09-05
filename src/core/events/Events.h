@@ -18,4 +18,10 @@ namespace Chipbit::Events {
   struct LoadRomEvent {
     std::string rom;
   };
+
+  struct UpdateTPFEvent {
+    unsigned int ticksPerFrame;
+  };
+
+  struct ResetEvent {};
 }
