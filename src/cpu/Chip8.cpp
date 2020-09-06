@@ -12,6 +12,44 @@
 Chipbit::Chip8::Chip8() {
   m_CPU = std::make_shared<CPU>();
 
+  m_Font = {
+      0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+      0x20, 0x60, 0x20, 0x20, 0x70, // 1
+      0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+      0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+      0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+      0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+      0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+      0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+      0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+      0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+      0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+      0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+      0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+      0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+      0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+      0xF0, 0x80, 0xF0, 0x80, 0x80  // F
+  };
+
+  m_BigFont = {
+      0x7C, 0x82, 0x82, 0x82, 0x82, 0x82, 0x82, 0x82, 0x7C, 0x00, // 0
+      0x08, 0x18, 0x38, 0x08, 0x08, 0x08, 0x08, 0x08, 0x3C, 0x00, // 1
+      0x7C, 0x82, 0x02, 0x02, 0x04, 0x18, 0x20, 0x40, 0xFE, 0x00, // 2
+      0x7C, 0x82, 0x02, 0x02, 0x3C, 0x02, 0x02, 0x82, 0x7C, 0x00, // 3
+      0x84, 0x84, 0x84, 0x84, 0xFE, 0x04, 0x04, 0x04, 0x04, 0x00, // 4
+      0xFE, 0x80, 0x80, 0x80, 0xFC, 0x02, 0x02, 0x82, 0x7C, 0x00, // 5
+      0x7C, 0x82, 0x80, 0x80, 0xFC, 0x82, 0x82, 0x82, 0x7C, 0x00, // 6
+      0xFE, 0x02, 0x04, 0x08, 0x10, 0x20, 0x20, 0x20, 0x20, 0x00, // 7
+      0x7C, 0x82, 0x82, 0x82, 0x7C, 0x82, 0x82, 0x82, 0x7C, 0x00, // 8
+      0x7C, 0x82, 0x82, 0x82, 0x7E, 0x02, 0x02, 0x82, 0x7C, 0x00, // 9
+      0x10, 0x28, 0x44, 0x82, 0x82, 0xFE, 0x82, 0x82, 0x82, 0x00, // A
+      0xFC, 0x82, 0x82, 0x82, 0xFC, 0x82, 0x82, 0x82, 0xFC, 0x00, // B
+      0x7C, 0x82, 0x80, 0x80, 0x80, 0x80, 0x80, 0x82, 0x7C, 0x00, // C
+      0xFC, 0x82, 0x82, 0x82, 0x82, 0x82, 0x82, 0x82, 0xFC, 0x00, // D
+      0xFE, 0x80, 0x80, 0x80, 0xF8, 0x80, 0x80, 0x80, 0xFE, 0x00, // E
+      0xFE, 0x80, 0x80, 0x80, 0xF8, 0x80, 0x80, 0x80, 0x80, 0x00, // F
+  };
+
   m_Vectors = {
       OPCODE(0000), OPCODE(1000), OPCODE(2000), OPCODE(3000),
       OPCODE(4000), OPCODE(5000), OPCODE(6000), OPCODE(7000),
@@ -22,11 +60,15 @@ Chipbit::Chip8::Chip8() {
   LoadFonts();
 
   m_OnColor = Color(255, 255, 255, 255);
-  m_OffColor = Color(33, 33, 33,255);
+  m_OffColor = Color(33, 33, 33, 255);
   m_CPU->framebuffer = std::vector<unsigned int>(128 * 64, m_OffColor);
 }
 
 bool Chipbit::Chip8::Tick() {
+
+  if(m_CPU->halted)
+    return false;
+
   if (m_CPU->PC >= 4096) {
     m_CPU->PC = 0x200;
     CB_WARN("Program Counter overflow");
@@ -50,6 +92,13 @@ bool Chipbit::Chip8::Tick() {
   }
 
   unsigned short opcode = m_CPU->ram[m_CPU->PC] << 8 | m_CPU->ram[m_CPU->PC + 1];
+
+  // Initialize Chip8 Hires
+  if (m_CPU->PC == 0x200 && opcode == 0x1260) {
+    opcode = 0x12C0;
+    m_CPU->c8hires = true;
+  }
+
   m_CPU->PC += 2;
 
   m_Vectors[(opcode & 0xF000) >> 12](opcode & 0x0FFF);
@@ -58,72 +107,85 @@ bool Chipbit::Chip8::Tick() {
 }
 
 void Chipbit::Chip8::Opcode0000(unsigned short operand) {
-  switch ((operand & 0x0F0) >> 4) {
-    case 0xC: {
-      auto count = operand & 0x00F;
-      ScrollDown(count);
-      m_CPU->draw = true;
+  if (operand == 0x0230) { // Chip8 Hires Clearscreen
+    m_CPU->framebuffer = std::vector<unsigned int>(128 * 64, m_OffColor);
+    m_CPU->draw = true;
+  } else {
+    switch ((operand & 0x0F0) >> 4) {
+      case 0xC: {
+        auto count = operand & 0x00F;
+        ScrollDown(count);
+        m_CPU->draw = true;
+      }
+        break;
+
+      case 0xD: {
+        auto count = operand & 0x00F;
+        ScrollUp(count);
+        m_CPU->draw = true;
+      }
+        break;
+
+      case 0xE:
+        switch (operand) {
+          case 0x0E0:
+            m_CPU->framebuffer = std::vector<unsigned int>(128 * 64, m_OffColor);
+            m_CPU->draw = true;
+            break;
+
+          case 0x0EE:
+            if (m_CPU->SP == 0) {
+              CB_ERROR("Stack underflow");
+            } else {
+              m_CPU->SP--;
+              m_CPU->PC = m_CPU->stack[m_CPU->SP];
+            }
+            break;
+
+          default:
+            CB_WARN("Invalid 0x00E0 Opcode: {:#04x}", operand);
+            break;
+        }
+        break;
+
+      case 0xF:
+        switch (operand) {
+          case 0x0FB:
+            ScrollRight(4);
+            m_CPU->draw = true;
+            break;
+
+          case 0x0FC:
+            ScrollLeft(4);
+            m_CPU->draw = true;
+            break;
+
+          case 0x0FD:
+            CB_INFO("Exit");
+            m_CPU->halted = true;
+            EventManager::Dispatcher().trigger<Events::PauseEvent>();
+            break;
+
+          case 0x0FE:
+            CB_INFO("Lores On");
+            m_CPU->hires = false;
+            break;
+
+          case 0x0FF:
+            CB_INFO("Hires On");
+            m_CPU->hires = true;
+            break;
+
+          default:
+            CB_WARN("Invalid 0x00F0 Opcode: {:#04x}", operand);
+            break;
+        }
+        break;
+
+      default:
+        CB_WARN("Invalid 0x0000 Opcode: {:#04x}", operand);
+        break;
     }
-      break;
-
-    case 0xE:
-      switch (operand) {
-        case 0x0E0:
-          m_CPU->framebuffer = std::vector<unsigned int>(128 * 64, m_OffColor);
-          m_CPU->draw = true;
-          break;
-
-        case 0x0EE:
-          if (m_CPU->SP == 0) {
-            CB_ERROR("Stack underflow");
-          } else {
-            m_CPU->SP--;
-            m_CPU->PC = m_CPU->stack[m_CPU->SP];
-          }
-          break;
-
-        default:
-          CB_WARN("Invalid 0x00E0 Opcode: {:#04x}", operand);
-          break;
-      }
-      break;
-
-    case 0xF:
-      switch (operand) {
-        case 0x0FB:
-          ScrollRight(4);
-          m_CPU->draw = true;
-          break;
-
-        case 0x0FC:
-          ScrollLeft(4);
-          m_CPU->draw = true;
-          break;
-
-        case 0x0FD:
-          CB_INFO("Exit");
-          EventManager::Dispatcher().trigger<Events::PauseEvent>();
-          break;
-
-        case 0x0FE:
-          CB_INFO("Lores On");
-          m_CPU->hires = false;
-          break;
-
-        case 0x0FF:
-          CB_INFO("Hires On");
-          m_CPU->hires = true;
-          break;
-
-        default:
-          CB_WARN("Invalid 0x00F0 Opcode: {:#04x}", operand);
-          break;
-      }
-      break;
-
-    default:
-      CB_WARN("Invalid 0x0000 Opcode: {:#04x}", operand);
-      break;
   }
 }
 
@@ -164,9 +226,30 @@ void Chipbit::Chip8::Opcode4000(unsigned short operand) {
 void Chipbit::Chip8::Opcode5000(unsigned short operand) {
   unsigned char X = (operand & 0xF00) >> 8;
   unsigned char Y = (operand & 0x0F0) >> 4;
+  unsigned char operation = (operand & 0x00F);
 
-  if (V(X) == V(Y)) {
-    m_CPU->PC += 2;
+  switch (operation) {
+    case 0:
+      if (V(X) == V(Y)) {
+        m_CPU->PC += 2;
+      }
+      break;
+
+    case 2: {
+      for (int i = X, index = m_CPU->I; i <= Y; i++, index++)
+        m_CPU->ram[index] = V(i);
+    }
+      break;
+
+    case 3: {
+      for (int i = X, index = m_CPU->I; i <= Y; i++, index++)
+        V(i) = m_CPU->ram[index];
+    }
+      break;
+
+    default:
+      CB_WARN("Invalid 0x5000 opcode {0}", operand);
+      break;
   }
 }
 
@@ -213,6 +296,9 @@ void Chipbit::Chip8::Opcode8000(unsigned short operand) {
     case 0x5:
       V(0xF) = V(X) > V(Y);
       V(X) -= V(Y);
+
+      if (V(X) == 0)
+        V(0xF) = 1;
       break;
 
     case 0x6:
@@ -224,6 +310,9 @@ void Chipbit::Chip8::Opcode8000(unsigned short operand) {
     case 0x7:
       V(0xF) = V(Y) > V(X);
       V(X) = V(Y) - V(X);
+
+      if (V(X) == 0)
+        V(0xF) = 1;
       break;
 
     case 0xE:
@@ -272,7 +361,7 @@ void Chipbit::Chip8::OpcodeD000(unsigned short operand) {
 
   switch (height) {
     case 0x0:
-      if(m_CPU->hires) {
+      if (m_CPU->hires) {
         for (auto h = 0; h < 16; h++) {
           unsigned short spriteRow = m_CPU->ram[m_CPU->I + 2 * h] << 8 | m_CPU->ram[m_CPU->I + 2 * h + 1];
           for (auto w = 0; w < 16; w++) {
@@ -287,8 +376,8 @@ void Chipbit::Chip8::OpcodeD000(unsigned short operand) {
           }
         }
       } else {
-        for(auto h = 0; h < 16; h++) {
-          for(auto w = 0; w < 8; w++) {
+        for (auto h = 0; h < 16; h++) {
+          for (auto w = 0; w < 8; w++) {
             int pixel = (m_CPU->ram[m_CPU->I + h] >> (7 - w)) & 1;
 
             const int xw = (V(X) * scale) + w * scale % (64 * scale);
@@ -296,7 +385,7 @@ void Chipbit::Chip8::OpcodeD000(unsigned short operand) {
 
             auto result = SetPixel(xw, yh, pixel);
 
-            if(result)
+            if (result)
               V(0xF) = 1;
           }
         }
@@ -307,13 +396,18 @@ void Chipbit::Chip8::OpcodeD000(unsigned short operand) {
       for (auto h = 0; h < height; h++) {
         for (auto w = 0; w < 8; w++) {
           int pixel = (m_CPU->ram[m_CPU->I + h] >> (7 - w)) & 1;
-
           const int xw = (V(X) * scale) + w * scale % (64 * scale);
-          const int yh = (V(Y) * scale) + h * scale % (32 * scale);
+          int yh;
+
+          if (m_CPU->c8hires) {
+            yh = (V(Y) * scale) + h * scale % 64;
+          } else {
+            yh = (V(Y) * scale) + h * scale % (32 * scale);
+          }
 
           auto result = SetPixel(xw, yh, pixel);
 
-          if(result)
+          if (result)
             V(0xF) = 1;
         }
       }
@@ -348,55 +442,89 @@ void Chipbit::Chip8::OpcodeF000(unsigned short operand) {
   unsigned char X = (operand & 0xF00) >> 8;
   unsigned char operation = operand & 0x0FF;
 
-  switch (operation) {
-    case 0x7:
-      V(X) = m_CPU->delay_timer;
+  switch (operand) {
+    // Planes
+    case 0x001:
+    case 0x101:
+    case 0x201:
+    case 0x301:
+      m_CPU->activePlanes = X;
       break;
 
-    case 0xA:
-      m_CPU->waitForKeypress = true;
-      m_CPU->keypressResultReg = X;
-      break;
+    default: {
+      switch (operation) {
+        case 0x0:
+          m_CPU->I = m_CPU->ram[m_CPU->PC] << 8 | m_CPU->ram[m_CPU->PC + 1];
+          m_CPU->PC += 2;
+          break;
 
-    case 0x15:
-      m_CPU->delay_timer = V(X);
-      break;
+        case 0x2:
+          CB_INFO("X-O Audio");
+          break;
 
-    case 0x18:
-      m_CPU->sound_timer = V(X);
-      break;
+        case 0x7:
+          V(X) = m_CPU->delay_timer;
+          break;
 
-    case 0x1E:
-      // V(0xF) = (m_CPU->I + (unsigned short)V(X)) > 0xFFF;
-      m_CPU->I += V(X);
-      break;
+        case 0xA:
+          m_CPU->waitForKeypress = true;
+          m_CPU->keypressResultReg = X;
+          break;
 
-    case 0x29:
-      m_CPU->I = 5 * V(X);
-      break;
+        case 0x15:
+          m_CPU->delay_timer = V(X);
+          break;
 
-    case 0x30:
-      m_CPU->I = m_Font.size() + (10 * V(X));
-      break;
+        case 0x18:
+          m_CPU->sound_timer = V(X);
+          break;
 
-    case 0x33:
-      m_CPU->ram[m_CPU->I] = V(X) / 100;
-      m_CPU->ram[m_CPU->I + 1] = (V(X) / 10) % 10;
-      m_CPU->ram[m_CPU->I + 2] = V(X) % 10;
-      break;
+        case 0x1E:
+          V(0xF) = (m_CPU->I + (unsigned short)V(X)) > 0xFFF;
+          m_CPU->I += V(X);
+          break;
 
-    case 0x55:
-      for (int i = 0; i <= X; i++)
-        m_CPU->ram[m_CPU->I + i] = V(i);
-      break;
+        case 0x29:
+          m_CPU->I = 5 * V(X);
+          break;
 
-    case 0x65:
-      for (int i = 0; i <= X; i++)
-        V(i) = m_CPU->ram[m_CPU->I + i];
-      break;
+        case 0x30:
+          m_CPU->I = m_Font.size() + (10 * V(X));
+          break;
 
-    default:
-      CB_WARN("Invalid 0xF000 Operand: {:#04x}", operand);
+        case 0x33:
+          m_CPU->ram[m_CPU->I] = V(X) / 100;
+          m_CPU->ram[m_CPU->I + 1] = (V(X) / 10) % 10;
+          m_CPU->ram[m_CPU->I + 2] = V(X) % 10;
+          break;
+
+        case 0x55:
+          for (int i = 0; i <= X; i++)
+            m_CPU->ram[m_CPU->I + i] = V(i);
+          break;
+
+        case 0x65:
+          for (int i = 0; i <= X; i++)
+            V(i) = m_CPU->ram[m_CPU->I + i];
+          break;
+
+        case 0x75:
+          for (int i = 0; i <= X; i++)
+            if (i <= 7)
+              m_CPU->userRpl[i] = V(i);
+          break;
+
+        case 0x85:
+          for (int i = 0; i <= X; i++)
+            if (i <= 7)
+              V(i) = m_CPU->userRpl[i];
+          break;
+
+        default:
+          CB_WARN("Invalid 0xF000 Operand: {:#04x}", operand);
+          break;
+      }
+    }
       break;
   }
 }
@@ -483,13 +611,13 @@ bool Chipbit::Chip8::SetPixel(int x, int y, int currentPixel) {
   int indexBL = ((y + 1) * 128) + x;
   int indexBR = ((y + 1) * 128) + x + 1;
 
-  if(indexTR >= m_CPU->framebuffer.size())
+  if (indexTR >= m_CPU->framebuffer.size())
     indexTR = indexTL;
 
-  if(indexBL >= m_CPU->framebuffer.size())
+  if (indexBL >= m_CPU->framebuffer.size())
     indexBL = indexTL;
 
-  if(indexBR >= m_CPU->framebuffer.size())
+  if (indexBR >= m_CPU->framebuffer.size())
     indexBR = indexTL;
 
   auto currentState = (m_CPU->framebuffer[indexTL] == m_OnColor);
@@ -508,44 +636,6 @@ bool Chipbit::Chip8::SetPixel(int x, int y, int currentPixel) {
 }
 
 void Chipbit::Chip8::LoadFonts() {
-  m_Font = {
-      0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
-      0x20, 0x60, 0x20, 0x20, 0x70, // 1
-      0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
-      0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
-      0x90, 0x90, 0xF0, 0x10, 0x10, // 4
-      0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
-      0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
-      0xF0, 0x10, 0x20, 0x40, 0x40, // 7
-      0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
-      0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
-      0xF0, 0x90, 0xF0, 0x90, 0x90, // A
-      0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
-      0xF0, 0x80, 0x80, 0x80, 0xF0, // C
-      0xE0, 0x90, 0x90, 0x90, 0xE0, // D
-      0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
-      0xF0, 0x80, 0xF0, 0x80, 0x80  // F
-  };
-
-  m_BigFont = {
-      0x7C, 0x82, 0x82, 0x82, 0x82, 0x82, 0x82, 0x82, 0x7C, 0x00, // 0
-      0x08, 0x18, 0x38, 0x08, 0x08, 0x08, 0x08, 0x08, 0x3C, 0x00, // 1
-      0x7C, 0x82, 0x02, 0x02, 0x04, 0x18, 0x20, 0x40, 0xFE, 0x00, // 2
-      0x7C, 0x82, 0x02, 0x02, 0x3C, 0x02, 0x02, 0x82, 0x7C, 0x00, // 3
-      0x84, 0x84, 0x84, 0x84, 0xFE, 0x04, 0x04, 0x04, 0x04, 0x00, // 4
-      0xFE, 0x80, 0x80, 0x80, 0xFC, 0x02, 0x02, 0x82, 0x7C, 0x00, // 5
-      0x7C, 0x82, 0x80, 0x80, 0xFC, 0x82, 0x82, 0x82, 0x7C, 0x00, // 6
-      0xFE, 0x02, 0x04, 0x08, 0x10, 0x20, 0x20, 0x20, 0x20, 0x00, // 7
-      0x7C, 0x82, 0x82, 0x82, 0x7C, 0x82, 0x82, 0x82, 0x7C, 0x00, // 8
-      0x7C, 0x82, 0x82, 0x82, 0x7E, 0x02, 0x02, 0x82, 0x7C, 0x00, // 9
-      0x10, 0x28, 0x44, 0x82, 0x82, 0xFE, 0x82, 0x82, 0x82, 0x00, // A
-      0xFC, 0x82, 0x82, 0x82, 0xFC, 0x82, 0x82, 0x82, 0xFC, 0x00, // B
-      0x7C, 0x82, 0x80, 0x80, 0x80, 0x80, 0x80, 0x82, 0x7C, 0x00, // C
-      0xFC, 0x82, 0x82, 0x82, 0x82, 0x82, 0x82, 0x82, 0xFC, 0x00, // D
-      0xFE, 0x80, 0x80, 0x80, 0xF8, 0x80, 0x80, 0x80, 0xFE, 0x00, // E
-      0xFE, 0x80, 0x80, 0x80, 0xF8, 0x80, 0x80, 0x80, 0x80, 0x00, // F
-  };
-
   std::copy(m_Font.begin(), m_Font.end(), m_CPU->ram.begin());
   std::copy(m_BigFont.begin(), m_BigFont.end(), m_CPU->ram.begin() + m_Font.size());
 }

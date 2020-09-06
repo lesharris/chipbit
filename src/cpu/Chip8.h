@@ -16,6 +16,7 @@ namespace Chipbit {
 
       void Reset() {
         registers = std::vector<unsigned char>(16, 0);
+        userRpl = std::vector<unsigned char>(16, 0);
         ram = std::vector<unsigned char>(4096, 0);
         keys = std::vector<unsigned char>(16, 0);
 
@@ -33,6 +34,10 @@ namespace Chipbit {
           i = 0;
 
         hires = false;
+        c8hires = false;
+        activePlanes = 1;
+
+        halted = false;
       }
 
       unsigned char GetRandom() {
@@ -52,6 +57,7 @@ namespace Chipbit {
       unsigned short PC = 0x200;
 
       std::vector<unsigned char> registers;
+      std::vector<unsigned char> userRpl;
       std::vector<unsigned char> keys;
       std::vector<unsigned char> ram;
       std::vector<unsigned int> framebuffer;
@@ -63,6 +69,9 @@ namespace Chipbit {
       std::mt19937 mt{rd()};
 
       bool hires = false;
+      bool c8hires = false;
+      bool halted = false;
+      unsigned char activePlanes = 1;
     };
 
   public:
