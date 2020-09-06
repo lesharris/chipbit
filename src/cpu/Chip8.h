@@ -17,8 +17,12 @@ namespace Chipbit {
       void Reset() {
         registers = std::vector<unsigned char>(16, 0);
         userRpl = std::vector<unsigned char>(16, 0);
-        ram = std::vector<unsigned char>(4096, 0);
+        ram = std::vector<unsigned char>(128 * 1024, 0);
         keys = std::vector<unsigned char>(16, 0);
+        layers = {
+            std::vector<unsigned char>(128 * 64, 0),
+            std::vector<unsigned char>(128 * 64, 0)
+        };
 
         sound_timer = 0;
         delay_timer = 0;
@@ -60,7 +64,7 @@ namespace Chipbit {
       std::vector<unsigned char> userRpl;
       std::vector<unsigned char> keys;
       std::vector<unsigned char> ram;
-      std::vector<unsigned int> framebuffer;
+      std::vector<std::vector<unsigned char>> layers;
 
       unsigned char SP = 0;
       unsigned short stack[16]{};
@@ -93,12 +97,10 @@ namespace Chipbit {
     void Reset() {
       m_CPU->Reset();
       LoadFonts();
-      m_CPU->framebuffer = std::vector<unsigned int>(128 * 64, m_OffColor);
     }
 
     CPU& Get() { return *m_CPU; }
-    [[nodiscard]] std::vector<unsigned int> Framebuffer() const { return m_CPU->framebuffer; }
-
+    [[nodiscard]] std::vector<std::vector<unsigned char>> Framebuffer() const { return m_CPU->layers; }
   private:
     void Opcode0000(unsigned short operand);
     void Opcode1000(unsigned short operand);
@@ -119,17 +121,17 @@ namespace Chipbit {
 
     static unsigned int Color(unsigned int r, unsigned int g, unsigned int b, unsigned int a);
 
-    void ClearRow(int row);
-    void ClearColumn(int column);
-    void CopyRow(int source, int destination);
-    void CopyColumn(int source, int destination);
+    void ClearRow(int row, int layer);
+    void ClearColumn(int column, int layer);
+    void CopyRow(int source, int destination, int layer);
+    void CopyColumn(int source, int destination, int layer);
 
-    void ScrollUp(int count);
-    void ScrollDown(int count);
-    void ScrollLeft(int count);
-    void ScrollRight(int count);
+    void ScrollUp(int count, int layer);
+    void ScrollDown(int count, int layer);
+    void ScrollLeft(int count, int layer);
+    void ScrollRight(int count, int layer);
 
-    bool SetPixel(int x, int y, int currentPixel);
+    bool SetPixel(int x, int y, int currentPixel, int layer);
 
     void LoadFonts();
 

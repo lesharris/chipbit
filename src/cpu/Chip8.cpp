@@ -61,7 +61,11 @@ Chipbit::Chip8::Chip8() {
 
   m_OnColor = Color(255, 255, 255, 255);
   m_OffColor = Color(33, 33, 33, 255);
-  m_CPU->framebuffer = std::vector<unsigned int>(128 * 64, m_OffColor);
+
+  m_CPU->layers = {
+      std::vector<unsigned char>(128 * 64, 0),
+      std::vector<unsigned char>(128 * 64, 0)
+  };
 }
 
 bool Chipbit::Chip8::Tick() {
@@ -69,7 +73,7 @@ bool Chipbit::Chip8::Tick() {
   if(m_CPU->halted)
     return false;
 
-  if (m_CPU->PC >= 4096) {
+  if (m_CPU->PC >= 128 * 1024) {
     m_CPU->PC = 0x200;
     CB_WARN("Program Counter overflow");
   }
@@ -108,20 +112,28 @@ bool Chipbit::Chip8::Tick() {
 
 void Chipbit::Chip8::Opcode0000(unsigned short operand) {
   if (operand == 0x0230) { // Chip8 Hires Clearscreen
-    m_CPU->framebuffer = std::vector<unsigned int>(128 * 64, m_OffColor);
+    m_CPU->layers[0] = std::vector<unsigned char>(128 * 64, 0);
     m_CPU->draw = true;
   } else {
     switch ((operand & 0x0F0) >> 4) {
       case 0xC: {
-        auto count = operand & 0x00F;
-        ScrollDown(count);
+        for(auto layer = 0; layer < 2; layer++) {
+          if((m_CPU->activePlanes & (layer + 1)) == 0)
+            continue;
+          auto count = operand & 0x00F;
+          ScrollDown(count, layer);
+        }
         m_CPU->draw = true;
       }
         break;
 
       case 0xD: {
-        auto count = operand & 0x00F;
-        ScrollUp(count);
+        for(auto layer = 0; layer < 2; layer++) {
+          if ((m_CPU->activePlanes & (layer + 1)) == 0)
+            continue;
+          auto count = operand & 0x00F;
+          ScrollUp(count, layer);
+        }
         m_CPU->draw = true;
       }
         break;
@@ -129,7 +141,12 @@ void Chipbit::Chip8::Opcode0000(unsigned short operand) {
       case 0xE:
         switch (operand) {
           case 0x0E0:
-            m_CPU->framebuffer = std::vector<unsigned int>(128 * 64, m_OffColor);
+            for(auto layer = 0; layer < 2; layer++) {
+              if ((m_CPU->activePlanes & (layer + 1)) == 0)
+                continue;
+
+              m_CPU->layers[layer] = std::vector<unsigned char>(128 * 64, 0);
+            }
             m_CPU->draw = true;
             break;
 
@@ -151,12 +168,20 @@ void Chipbit::Chip8::Opcode0000(unsigned short operand) {
       case 0xF:
         switch (operand) {
           case 0x0FB:
-            ScrollRight(4);
+            for(auto layer = 0; layer < 2; layer++) {
+              if ((m_CPU->activePlanes & (layer + 1)) == 0)
+                continue;
+              ScrollRight(4, layer);
+            }
             m_CPU->draw = true;
             break;
 
           case 0x0FC:
-            ScrollLeft(4);
+            for(auto layer = 0; layer < 2; layer++) {
+              if ((m_CPU->activePlanes & (layer + 1)) == 0)
+                continue;
+              ScrollLeft(4, layer);
+            }
             m_CPU->draw = true;
             break;
 
@@ -358,60 +383,71 @@ void Chipbit::Chip8::OpcodeD000(unsigned short operand) {
 
   V(0xF) = 0;
   auto scale = m_CPU->hires ? 1 : 2;
+  auto I = m_CPU->I;
 
-  switch (height) {
-    case 0x0:
-      if (m_CPU->hires) {
-        for (auto h = 0; h < 16; h++) {
-          unsigned short spriteRow = m_CPU->ram[m_CPU->I + 2 * h] << 8 | m_CPU->ram[m_CPU->I + 2 * h + 1];
-          for (auto w = 0; w < 16; w++) {
-            const int pixel = (spriteRow >> (15 - w)) & 1;
-            int xw = V(X) + w;
-            int yh = V(Y) + h;
+  for(auto layer = 0; layer < 2; layer++ ) {
+    if((m_CPU->activePlanes & (layer + 1)) == 0)
+      continue;
 
-            auto result = SetPixel(xw, yh, pixel);
+    switch (height) {
+      case 0x0:
+        if (m_CPU->hires) {
+          for (auto h = 0; h < 16; h++) {
+            unsigned short spriteRow = m_CPU->ram[I + 2 * h] << 8 | m_CPU->ram[I + 2 * h + 1];
+            for (auto w = 0; w < 16; w++) {
+              const int pixel = (spriteRow >> (15 - w)) & 1;
+              int xw = V(X) + w;
+              int yh = V(Y) + h;
+              bool result;
 
-            if (result)
-              V(0xF) = 1;
+              result = SetPixel(xw, yh, pixel, layer);
+
+              if (result)
+                V(0xF) = 1;
+            }
           }
+
+          I += 32;
+        } else {
+          for (auto h = 0; h < 16; h++) {
+            for (auto w = 0; w < 8; w++) {
+              int pixel = (m_CPU->ram[I + h] >> (7 - w)) & 1;
+
+              const int xw = (V(X) * scale) + w * scale % (64 * scale);
+              const int yh = (V(Y) * scale) + h * scale % (32 * scale);
+
+              auto result = SetPixel(xw, yh, pixel, layer);
+
+              if (result)
+                V(0xF) = 1;
+            }
+          }
+          I += 24;
         }
-      } else {
-        for (auto h = 0; h < 16; h++) {
+        break;
+
+      default:
+        for (auto h = 0; h < height; h++) {
           for (auto w = 0; w < 8; w++) {
-            int pixel = (m_CPU->ram[m_CPU->I + h] >> (7 - w)) & 1;
-
+            int pixel = (m_CPU->ram[I + h] >> (7 - w)) & 1;
             const int xw = (V(X) * scale) + w * scale % (64 * scale);
-            const int yh = (V(Y) * scale) + h * scale % (32 * scale);
+            int yh;
 
-            auto result = SetPixel(xw, yh, pixel);
+            if (m_CPU->c8hires) {
+              yh = (V(Y) * scale) + h * scale % 64;
+            } else {
+              yh = (V(Y) * scale) + h * scale % (32 * scale);
+            }
+
+            auto result = SetPixel(xw, yh, pixel, layer);
 
             if (result)
               V(0xF) = 1;
           }
         }
-      }
-      break;
-
-    default:
-      for (auto h = 0; h < height; h++) {
-        for (auto w = 0; w < 8; w++) {
-          int pixel = (m_CPU->ram[m_CPU->I + h] >> (7 - w)) & 1;
-          const int xw = (V(X) * scale) + w * scale % (64 * scale);
-          int yh;
-
-          if (m_CPU->c8hires) {
-            yh = (V(Y) * scale) + h * scale % 64;
-          } else {
-            yh = (V(Y) * scale) + h * scale % (32 * scale);
-          }
-
-          auto result = SetPixel(xw, yh, pixel);
-
-          if (result)
-            V(0xF) = 1;
-        }
-      }
-      break;
+        I += height;
+        break;
+    }
   }
 
   m_CPU->draw = true;
@@ -541,95 +577,97 @@ unsigned int Chipbit::Chip8::Color(unsigned int r, unsigned int g, unsigned int 
   return r << 24 | g << 16 | b << 8 | a;
 }
 
-void Chipbit::Chip8::CopyRow(int source, int destination) {
-  std::copy_n(m_CPU->framebuffer.cbegin() + source * 128, 128, m_CPU->framebuffer.begin() + destination * 128);
+void Chipbit::Chip8::CopyRow(int source, int destination, int layer) {
+  std::copy_n(m_CPU->layers[layer].cbegin() + source * 128, 128, m_CPU->layers[layer].begin() + destination * 128);
 }
 
-void Chipbit::Chip8::CopyColumn(int source, int destination) {
+void Chipbit::Chip8::CopyColumn(int source, int destination, int layer) {
   for (int y = 0; y < 64; ++y) {
     auto rowOffset = y * 128;
-    m_CPU->framebuffer[destination + rowOffset] = m_CPU->framebuffer[source + rowOffset];
+    m_CPU->layers[layer][destination + rowOffset] = m_CPU->layers[layer][source + rowOffset];
   }
 }
 
-void Chipbit::Chip8::ScrollDown(int count) {
-  for (int y = 64 - count - 1; y >= 0; --y) {
-    CopyRow(y, y + count);
-  }
-
-  for (int y = 0; y < count; ++y) {
-    ClearRow(y);
-  }
+void Chipbit::Chip8::ClearRow(int row, int layer) {
+  std::fill_n(m_CPU->layers[layer].begin() + row * 128, 128, 0);
 }
 
-void Chipbit::Chip8::ClearRow(int row) {
-  std::fill_n(m_CPU->framebuffer.begin() + row * 128, 128, m_OffColor);
-}
-
-void Chipbit::Chip8::ClearColumn(int column) {
+void Chipbit::Chip8::ClearColumn(int column, int layer) {
   for (int y = 0; y < 64; ++y) {
-    m_CPU->framebuffer[column + (y * 128)] = m_OffColor;
+    m_CPU->layers[layer][column + (y * 128)] = 0;
   }
 }
 
-void Chipbit::Chip8::ScrollUp(int count) {
-  for (int y = 0; y < (64 - count); ++y) {
-    CopyRow(y + count, y);
+void Chipbit::Chip8::ScrollDown(int count, int layer) {
+  for (int y = 64 - count - 1; y >= 0; --y) {
+    CopyRow(y, y + count, layer);
   }
 
   for (int y = 0; y < count; ++y) {
-    ClearRow(64 - y - 1);
+    ClearRow(y, layer);
   }
 }
 
-void Chipbit::Chip8::ScrollLeft(int count) {
+void Chipbit::Chip8::ScrollUp(int count, int layer) {
+  for (int y = 0; y < (64 - count); ++y) {
+    CopyRow(y + count, y, layer);
+  }
+
+  for (int y = 0; y < count; ++y) {
+    ClearRow(64 - y - 1, layer);
+  }
+}
+
+void Chipbit::Chip8::ScrollLeft(int count, int layer) {
   for (int x = 0; x < (128 - count); ++x) {
-    CopyColumn(x + count, x);
+    CopyColumn(x + count, x, layer);
   }
 
   for (int x = 0; x < count; ++x) {
-    ClearColumn(128 - x - 1);
+    ClearColumn(128 - x - 1, layer);
   }
 }
 
-void Chipbit::Chip8::ScrollRight(int count) {
+void Chipbit::Chip8::ScrollRight(int count, int layer) {
   for (int x = 128 - count - 1; x >= 0; --x) {
-    CopyColumn(x, x + count);
+    CopyColumn(x, x + count, layer);
   }
 
   for (int x = 0; x < count; ++x) {
-    ClearColumn(x);
+    ClearColumn(x, layer);
   }
 }
 
-bool Chipbit::Chip8::SetPixel(int x, int y, int currentPixel) {
+bool Chipbit::Chip8::SetPixel(int x, int y, int currentPixel, int layer) {
   x %= 128;
   y %= 64;
+
+  std::vector<unsigned char>& fb = m_CPU->layers[layer];
 
   const int indexTL = (y * 128) + x;
   int indexTR = (y * 128) + x + 1;
   int indexBL = ((y + 1) * 128) + x;
   int indexBR = ((y + 1) * 128) + x + 1;
 
-  if (indexTR >= m_CPU->framebuffer.size())
+  if (indexTR >= fb.size())
     indexTR = indexTL;
 
-  if (indexBL >= m_CPU->framebuffer.size())
+  if (indexBL >= fb.size())
     indexBL = indexTL;
 
-  if (indexBR >= m_CPU->framebuffer.size())
+  if (indexBR >= fb.size())
     indexBR = indexTL;
 
-  auto currentState = (m_CPU->framebuffer[indexTL] == m_OnColor);
-  auto color = (currentState ^ currentPixel) ? m_OnColor : m_OffColor;
+  auto currentState = (fb[indexTL] == 1);
+  auto color = (currentState ^ currentPixel) ? 1 : 0;
 
   if (!m_CPU->hires) {
-    m_CPU->framebuffer[indexTL] = color;
-    m_CPU->framebuffer[indexTR] = color;
-    m_CPU->framebuffer[indexBL] = color;
-    m_CPU->framebuffer[indexBR] = color;
+    fb[indexTL] = color;
+    fb[indexTR] = color;
+    fb[indexBL] = color;
+    fb[indexBR] = color;
   } else {
-    m_CPU->framebuffer[indexTL] = color;
+    fb[indexTL] = color;
   }
 
   return currentState & currentPixel;

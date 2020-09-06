@@ -3,7 +3,6 @@ layout(location = 0) in vec2 position;
 layout(location = 1) in vec2 texCoord;
 
 out vec2 UV;
-uniform mat4 MVP;
 
 void main()
 {

@@ -8,6 +8,7 @@
 #include "gui/Gui.h"
 
 #include "core/events/Events.h"
+#include <glm/glm.hpp>
 
 namespace Chipbit {
   class Chipbit {
