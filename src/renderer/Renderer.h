@@ -31,9 +31,13 @@ namespace Chipbit {
     std::shared_ptr<Shader> m_C8Shader;
     std::shared_ptr<Shader> m_ScreenShader;
 
-    glm::vec3 m_BGColor{202.0f / 255.0f, 220.0f / 255.0f, 159.0f / 255.0f};
-    glm::vec3 m_L1Color { 48.0f/ 255.0f, 98.0f / 255.0f, 48.0f / 255.0f};
+    glm::vec3 m_L1Color{1.0f, 204.0f / 255.0f, 0.0f};
+    glm::vec3 m_L2Color{1.0f, 102.0f / 255.0f, 0.0f};
+    glm::vec3 m_CombColor{102.0f / 255.0f, 34.0f / 255.0f, 0.0f};
+    glm::vec3 m_BGColor{153.0f / 255.0f, 102.0f / 255.0f, 0.0f};
+  /*  glm::vec3 m_BGColor{202.0f / 255.0f, 220.0f / 255.0f, 159.0f / 255.0f};
     glm::vec3 m_L2Color { 139.0f / 255.0f, 172.0f / 255.0f, 15.0f / 255.0f};
-    glm::vec3 m_CombColor { 155.0f / 255.0f, 188.0f / 255.0f, 15.0f / 255.0f};
+    glm::vec3 m_CombColor { 48.0f/ 255.0f, 98.0f / 255.0f, 48.0f / 255.0f};
+    glm::vec3 m_L1Color { 155.0f / 255.0f, 188.0f / 255.0f, 15.0f / 255.0f};*/
   };
 }

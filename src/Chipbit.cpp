@@ -4,6 +4,7 @@
 #include "core/EventManager.h"
 #include "core/Log.h"
 
+#include "compiler/Compiler.h"
 void Chipbit::Chipbit::Initialize() {
   m_Window = std::make_shared<Window>();
   m_CPU = std::make_shared<Chip8>();
@@ -38,6 +39,9 @@ void Chipbit::Chipbit::Initialize() {
 }
 
 void Chipbit::Chipbit::Run() {
+  Compiler c{};
+
+  c.Test();
   while(!m_Window->ShouldClose()) {
     const double time = glfwGetTime();
     m_DeltaTime += (time - m_LastFrameTime) / (1.0 / 60.0);
@@ -46,7 +50,6 @@ void Chipbit::Chipbit::Run() {
     m_Window->BeginFrame();
 
     {
-      std::vector<unsigned char> keyBuf(16, 0);
       auto keys = m_Input->poll();
       bool pauseHit = false;
       std::for_each(keys.begin(), keys.end(), [&](Action action) {
@@ -62,40 +65,44 @@ void Chipbit::Chipbit::Run() {
             break;
 
           default:
-            if(!m_Paused)
-              keyBuf[ActionToKey[action]] = 1;
             break;
         }
       });
 
       m_PauseLastFrame = pauseHit;
-
-      if(!m_Paused)
-        m_CPU->SetKeys(keyBuf);
     }
 
     if(!m_Paused) {
-      {
         // Tick timers at 60hz
         while (m_DeltaTime >= 1.0) {
           m_CPU->TickTimers();
           m_DeltaTime--;
         }
 
-        for (auto i = 0; i < m_TicksPerFrame; i++)
-          m_CPU->Tick();
+        std::vector<unsigned char> keyBuf(16, 0);
+        for (auto i = 0; i < m_TicksPerFrame; i++) {
 
-        // Update Framebuffer texture
-        if (m_CPU->Draw()) {
-          m_CPU->ClearDraw();
-          m_Renderer->Draw(m_CPU->Framebuffer());
+          glfwPollEvents();
+          auto keys = m_Input->poll();
+
+          std::for_each(keys.begin(), keys.end(), [&](Action action) {
+            if(action != Action::Pause)
+              keyBuf[ActionToKey[action]] = 1;
+          });
+
+          m_CPU->SetKeys(keyBuf);
+          m_CPU->Tick();
         }
+
+      // Update Framebuffer texture
+      if (m_CPU->Draw()) {
+        m_CPU->ClearDraw();
+        m_Renderer->Draw(m_CPU->Framebuffer());
       }
     }
 
     // Render Framebuffer texture every frame
     m_Renderer->Render();
-
     m_GUI->Render(m_CPU->Get());
 
     m_Window->EndFrame();

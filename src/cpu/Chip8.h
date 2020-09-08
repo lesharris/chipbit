@@ -17,6 +17,7 @@ namespace Chipbit {
       void Reset() {
         registers = std::vector<unsigned char>(16, 0);
         userRpl = std::vector<unsigned char>(16, 0);
+        pattern = std::vector<unsigned char>(16, 0);
         ram = std::vector<unsigned char>(128 * 1024, 0);
         keys = std::vector<unsigned char>(16, 0);
         layers = {
@@ -57,13 +58,14 @@ namespace Chipbit {
       unsigned char sound_timer = 0;
       unsigned char delay_timer = 0;
 
-      unsigned short I = 0;
-      unsigned short PC = 0x200;
+      unsigned int I = 0;
+      unsigned int PC = 0x200;
 
       std::vector<unsigned char> registers;
       std::vector<unsigned char> userRpl;
       std::vector<unsigned char> keys;
       std::vector<unsigned char> ram;
+      std::vector<unsigned char> pattern;
       std::vector<std::vector<unsigned char>> layers;
 
       unsigned char SP = 0;

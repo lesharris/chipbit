@@ -1,7 +1,8 @@
 #include "Chip8.h"
 
 #include <vector>
-
+#include <algorithm>
+#include <sstream>
 #include "../core/events/Events.h"
 #include "../core/EventManager.h"
 #include "../core/Log.h"
@@ -261,14 +262,28 @@ void Chipbit::Chip8::Opcode5000(unsigned short operand) {
       break;
 
     case 2: {
-      for (int i = X, index = m_CPU->I; i <= Y; i++, index++)
-        m_CPU->ram[index] = V(i);
+      unsigned int dist = std::abs(X - Y);
+
+      if(X < Y) {
+        for(auto z = 0; z <= dist; z++)
+            m_CPU->ram[m_CPU->I + z] = V(X + z);
+      } else {
+        for(auto z = 0; z <= dist; z++)
+          m_CPU->ram[m_CPU->I + z] = V(X - z);
+      }
     }
       break;
 
     case 3: {
-      for (int i = X, index = m_CPU->I; i <= Y; i++, index++)
-        V(i) = m_CPU->ram[index];
+      unsigned int dist= std::abs(X - Y);
+
+      if(X < Y) {
+        for(auto z = 0; z <= dist; z++)
+          V(X + z) = m_CPU->ram[m_CPU->I + z];
+      } else {
+        for(auto z = 0; z <= dist; z++)
+          V(X - z) = m_CPU->ram[m_CPU->I + z];
+      }
     }
       break;
 
@@ -314,12 +329,12 @@ void Chipbit::Chip8::Opcode8000(unsigned short operand) {
       break;
 
     case 0x4:
-      V(0xF) = V(X) > (0xFF - V(Y));
+      V(0xF) = V(X) >= (0xFF - V(Y));
       V(X) += V(Y);
       break;
 
     case 0x5:
-      V(0xF) = V(X) > V(Y);
+      V(0xF) = V(X) >= V(Y);
       V(X) -= V(Y);
 
       if (V(X) == 0)
@@ -333,15 +348,12 @@ void Chipbit::Chip8::Opcode8000(unsigned short operand) {
       break;
 
     case 0x7:
-      V(0xF) = V(Y) > V(X);
+      V(0xF) = V(Y) >= V(X);
       V(X) = V(Y) - V(X);
-
-      if (V(X) == 0)
-        V(0xF) = 1;
       break;
 
     case 0xE:
-      V(0xF) = V(X) & 0x80 ? 1 : 0;
+      V(0xF) = ((V(X) >> 7) & 0x1);
       V(X) <<= 1;
       // V(X) = V(Y) << 1 ;
       break;
@@ -385,30 +397,33 @@ void Chipbit::Chip8::OpcodeD000(unsigned short operand) {
   auto scale = m_CPU->hires ? 1 : 2;
   auto I = m_CPU->I;
 
+  auto rowSize = 64 * scale;
+  auto colSize = 32 * scale;
+
   for(auto layer = 0; layer < 2; layer++ ) {
     if((m_CPU->activePlanes & (layer + 1)) == 0)
       continue;
 
     switch (height) {
       case 0x0:
-        if (m_CPU->hires) {
+   //     if (m_CPU->hires) {
           for (auto h = 0; h < 16; h++) {
             unsigned short spriteRow = m_CPU->ram[I + 2 * h] << 8 | m_CPU->ram[I + 2 * h + 1];
             for (auto w = 0; w < 16; w++) {
-              const int pixel = (spriteRow >> (15 - w)) & 1;
+              unsigned char pixel = ((spriteRow >> (15 - w)) & 0x1) != 0;
               int xw = V(X) + w;
               int yh = V(Y) + h;
-              bool result;
 
-              result = SetPixel(xw, yh, pixel, layer);
+              if(!pixel)
+                continue;
 
-              if (result)
+              if(SetPixel(xw, yh, pixel, layer))
                 V(0xF) = 1;
             }
           }
 
           I += 32;
-        } else {
+     /*   } else {
           for (auto h = 0; h < 16; h++) {
             for (auto w = 0; w < 8; w++) {
               int pixel = (m_CPU->ram[I + h] >> (7 - w)) & 1;
@@ -423,25 +438,21 @@ void Chipbit::Chip8::OpcodeD000(unsigned short operand) {
             }
           }
           I += 24;
-        }
+        }*/
         break;
 
       default:
         for (auto h = 0; h < height; h++) {
           for (auto w = 0; w < 8; w++) {
-            int pixel = (m_CPU->ram[I + h] >> (7 - w)) & 1;
-            const int xw = (V(X) * scale) + w * scale % (64 * scale);
-            int yh;
+            const int xw = (V(X) * scale) + w * scale % rowSize;
+            const int yh = (V(Y) * scale) + h * scale % colSize;
 
-            if (m_CPU->c8hires) {
-              yh = (V(Y) * scale) + h * scale % 64;
-            } else {
-              yh = (V(Y) * scale) + h * scale % (32 * scale);
-            }
+            unsigned char pixel = ((m_CPU->ram[I + h] >> (7 - w)) & 0x1) != 0;
 
-            auto result = SetPixel(xw, yh, pixel, layer);
+            if(!pixel)
+              continue;
 
-            if (result)
+            if(SetPixel(xw, yh, pixel, layer))
               V(0xF) = 1;
           }
         }
@@ -457,14 +468,22 @@ void Chipbit::Chip8::OpcodeE000(unsigned short operand) {
   unsigned char X = (operand & 0xF00) >> 8;
   unsigned char operation = operand & 0x0FF;
 
+  std::stringstream ss;
+
+  for(int i = 0; i < 16; i++)
+    if(m_CPU->keys[i] != 0)
+      ss << fmt::format("{:02x}", i);
+
+  CB_INFO("Keys: {0}", ss.str());
+  CB_INFO("X: {0}, V(X): {1}, m_CPU->keys[V(X)]: {2}", X, V(X), m_CPU->keys[V(X)]);
   switch (operation) {
     case 0x9E:
-      if (m_CPU->keys[V(X)] == 1)
+      if (m_CPU->keys[V(X)])
         m_CPU->PC += 2;
       break;
 
     case 0xA1:
-      if (m_CPU->keys[V(X)] == 0)
+      if (!m_CPU->keys[V(X)])
         m_CPU->PC += 2;
       break;
 
@@ -484,18 +503,19 @@ void Chipbit::Chip8::OpcodeF000(unsigned short operand) {
     case 0x101:
     case 0x201:
     case 0x301:
-      m_CPU->activePlanes = X;
+      m_CPU->activePlanes = X & 0x3;
       break;
 
     default: {
       switch (operation) {
         case 0x0:
-          m_CPU->I = m_CPU->ram[m_CPU->PC] << 8 | m_CPU->ram[m_CPU->PC + 1];
+          m_CPU->I = m_CPU->ram[m_CPU->PC] << 8 | m_CPU->ram[m_CPU->PC + 1] & 0xFFFF;
           m_CPU->PC += 2;
           break;
 
         case 0x2:
-          CB_INFO("X-O Audio");
+          for(auto z = 0; z < 16; z++)
+            m_CPU->pattern[z] = m_CPU->ram[m_CPU->I + z];
           break;
 
         case 0x7:
@@ -566,10 +586,6 @@ void Chipbit::Chip8::OpcodeF000(unsigned short operand) {
 }
 
 void Chipbit::Chip8::Load(const std::vector<unsigned char> &data, int address) {
-  if (address >= 4096) {
-    return;
-  }
-
   std::copy(data.begin(), data.end(), m_CPU->ram.begin() + address);
 }
 
@@ -659,15 +675,12 @@ bool Chipbit::Chip8::SetPixel(int x, int y, int currentPixel, int layer) {
     indexBR = indexTL;
 
   auto currentState = (fb[indexTL] == 1);
-  auto color = (currentState ^ currentPixel) ? 1 : 0;
+  fb[indexTL] = (currentState ^ currentPixel) ? 1 : 0;
 
   if (!m_CPU->hires) {
-    fb[indexTL] = color;
-    fb[indexTR] = color;
-    fb[indexBL] = color;
-    fb[indexBR] = color;
-  } else {
-    fb[indexTL] = color;
+    fb[indexTR] = fb[indexTL];
+    fb[indexBL] = fb[indexTL];
+    fb[indexBR] = fb[indexTL];
   }
 
   return currentState & currentPixel;
