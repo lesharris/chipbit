@@ -468,14 +468,6 @@ void Chipbit::Chip8::OpcodeE000(unsigned short operand) {
   unsigned char X = (operand & 0xF00) >> 8;
   unsigned char operation = operand & 0x0FF;
 
-  std::stringstream ss;
-
-  for(int i = 0; i < 16; i++)
-    if(m_CPU->keys[i] != 0)
-      ss << fmt::format("{:02x}", i);
-
-  CB_INFO("Keys: {0}", ss.str());
-  CB_INFO("X: {0}, V(X): {1}, m_CPU->keys[V(X)]: {2}", X, V(X), m_CPU->keys[V(X)]);
   switch (operation) {
     case 0x9E:
       if (m_CPU->keys[V(X)])
@@ -683,7 +675,7 @@ bool Chipbit::Chip8::SetPixel(int x, int y, int currentPixel, int layer) {
     fb[indexBR] = fb[indexTL];
   }
 
-  return currentState & currentPixel;
+  return currentState & currentPixel ? true : false;
 }
 
 void Chipbit::Chip8::LoadFonts() {
