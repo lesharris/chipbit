@@ -12,14 +12,14 @@ Chipbit::Compiler::Compiler() {
 std::variant<int, std::string> Chipbit::Compiler::parse(const std::string &token) {
   auto num = parseNumber(token);
 
-  if(std::isnan(num)) {
-    return std::variant<int, std::string>(token);
+  if(std::get<0>(num)) {
+    return std::variant<int, std::string>(std::get<1>(num));
   } else {
-    return std::variant<int, std::string>(num);
+    return std::variant<int, std::string>(token);
   }
 }
 
-int Chipbit::Compiler::parseNumber(const std::string &token) {
+std::tuple<bool, int> Chipbit::Compiler::parseNumber(const std::string &token) {
   const auto flags = std::regex::flag_type::ECMAScript | std::regex::flag_type::icase;
   std::regex binaryNumber{"^[+\\-]?0b[01]+$", flags};
   std::regex hexNumber{"^[+\\-]?0x[0-9a-f]+$", flags};
@@ -36,22 +36,22 @@ int Chipbit::Compiler::parseNumber(const std::string &token) {
     }
 
     auto value = std::stoi(bitstring, nullptr, 2);
-    return isNegative ? -value : value;
+    return isNegative ? std::tuple<bool, int>(true, -value) : std::tuple<bool, int>(true, value);
   }
 
   if(std::regex_match(token, hexNumber)) {
-    return std::stoi(token, nullptr, 16);
+    return std::tuple<bool, int>(true, std::stoi(token, nullptr, 16));
   }
 
   if(std::regex_match(token, decimalNumber)) {
-    return std::stoi(token);
+    return std::tuple<bool, int>(true, std::stoi(token));
   }
 
-  return std::numeric_limits<int>::quiet_NaN();
+  return std::tuple<bool, int>(false, std::numeric_limits<int>::quiet_NaN());
 }
 
 void Chipbit::Compiler::Test() {
-  auto foo = tokenize("0b101\n\"this is a string\"\n\someToken\nbooBear\n123\n0x20\nyay");
+  auto foo = tokenize("0b101\n\"this is a string\"\nsomeToken\nbooBear\n123\n0x20\nyay");
   CB_INFO("Tokenized");
 }
 
@@ -124,3 +124,4 @@ std::vector<std::tuple<std::variant<int, std::string>, int, int>> Chipbit::Compi
 
   return ret;
 }
+

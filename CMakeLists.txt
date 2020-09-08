@@ -64,7 +64,7 @@ add_executable(chipbit src/main.cpp
     deps/TextEditor.h
     src/gui/widgets/CodeEditor.cpp
     src/gui/widgets/CodeEditor.h
-    deps/ImGuiFileDialog.cpp src/gui/widgets/Main.cpp src/gui/widgets/Main.h src/compiler/Compiler.cpp src/compiler/Compiler.h)
+    deps/ImGuiFileDialog.cpp src/gui/widgets/Main.cpp src/gui/widgets/Main.h src/compiler/Compiler.cpp src/compiler/Compiler.h src/core/Utils.cpp src/core/Utils.h)
 
 target_link_libraries(chipbit PRIVATE
     glfw
