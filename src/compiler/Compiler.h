@@ -13,9 +13,19 @@
 
 #include "../core/Utils.h"
 
+#define Unary(label, intFunc, floatFunc) \
+  UnaryPair{(label), [](auto& x) -> void {std::visit(overload{(intFunc),(floatFunc)}, x);}}
+
 namespace Chipbit {
   class Compiler {
   public:
+    template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
+    template<class... Ts> overload(Ts...) -> overload<Ts...>;
+
+    template<typename T, typename U>
+    using UnaryFunc = std::function<void(std::variant<T, U>&)>;
+    using UnaryPair = std::pair<std::string, UnaryFunc<int, float>>;
+
     class DebugInfo {
     public:
       explicit DebugInfo(const std::string& source) : lines(StringUtils::SplitLines(source)) {};
@@ -90,11 +100,26 @@ namespace Chipbit {
         {'"',  '"'},
     };
 
-    std::map<std::string, std::function<int(int x)>> unaryIntFuncs{
-        {"-", [](int x) -> int {return -x;}},
-        {"~", [](int x) -> int {return ~x;}},
-        {"!", [](int x) -> int {return !x;}}
+    std::map<std::string, UnaryFunc<int, float>> unaryFuncs{
+      Unary("-", [](int& i) { i = -i; }, [](float& f) { f = -f; }),
+      Unary("~", [](int& i) { i = ~i;}, [](float& f) {}),
+      Unary("!", [](int& i) { i = !i;}, [](float& f) {f = !f;}),
+      Unary("sin", [](int& i) { i = static_cast<int>(std::sin(i));}, [](float& f){f = std::sin(f);}),
+      Unary("cos", [](int& i) { i = static_cast<int>(std::cos(i));}, [](float& f){f = std::cos(f);}),
+      Unary("tan", [](int& i) { i = static_cast<int>(std::tan(i));}, [](float& f){f = std::tan(f);}),
+      Unary("exp", [](int& i) { i = static_cast<int>(std::exp(i));}, [](float& f){f = std::exp(f);}),
+      Unary("log", [](int& i) { i = static_cast<int>(std::log(i));}, [](float& f){f = std::log(f);}),
+      Unary("abs", [](int& i) { i = static_cast<int>(std::abs(i));}, [](float& f){f = std::abs(f);}),
+      Unary("sqrt", [](int& i) { i = static_cast<int>(std::sqrt(i));}, [](float& f){f = std::sqrt(f);}),
+      Unary("sign", [](int& i) { i = static_cast<int>(std::exp(i));}, [](float& f){f = std::exp(f);}),
+      Unary("ceil", [](int& i) { i = static_cast<int>(std::ceil(i));}, [](float& f){f = std::floor(f);}),
+      Unary("floor", [](int& i) { i = static_cast<int>(std::floor(i));}, [](float& f){f = std::floor(f);})
+
+
     };
+
+    /*        {"~", [](auto x) -> auto {return ~x;}},
+        {"!", [](auto x) -> auto {return !x;}}*/
 
     std::map<std::string, std::function<float(float x)>> unaryFloatFuncs {
         {"sin", [](float x) -> float {return std::sin(x);}},

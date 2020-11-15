@@ -5,6 +5,7 @@
 #include "core/Log.h"
 
 #include "compiler/Compiler.h"
+
 void Chipbit::Chipbit::Initialize() {
   m_Window = std::make_shared<Window>();
   m_CPU = std::make_shared<Chip8>();
@@ -39,9 +40,23 @@ void Chipbit::Chipbit::Initialize() {
 }
 
 void Chipbit::Chipbit::Run() {
-  Compiler c{};
+  std::map<std::string, Compiler::UnaryFunc<int, float>> unaryFuncs{
+      Compiler::UnaryPair{"-", [](auto& x) -> void { std::visit(Compiler::overload{
+          [](int& i) { i = -i; },
+          [](float& f) { f = -f; }
+      }, x);}}
+  };
 
-  c.Test();
+  auto func = unaryFuncs["-"];
+
+  auto intVal = std::variant<int, float>(1);
+  auto floatVal = std::variant<int, float>(1.0f);
+
+  func(intVal);
+  func(floatVal);
+
+  CB_INFO("Negate test: {0}, {1}", std::get<int>(intVal), std::get<float>(floatVal));
+
   while(!m_Window->ShouldClose()) {
     const double time = glfwGetTime();
     m_DeltaTime += (time - m_LastFrameTime) / (1.0 / 60.0);

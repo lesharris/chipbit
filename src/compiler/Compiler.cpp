@@ -5,10 +5,6 @@
 
 #include "../core/Log.h"
 
-Chipbit::Compiler::Compiler() {
-
-}
-
 std::variant<int, std::string> Chipbit::Compiler::parse(const std::string &token) {
   auto num = parseNumber(token);
 
@@ -48,11 +44,6 @@ std::tuple<bool, int> Chipbit::Compiler::parseNumber(const std::string &token) {
   }
 
   return std::tuple<bool, int>(false, std::numeric_limits<int>::quiet_NaN());
-}
-
-void Chipbit::Compiler::Test() {
-  auto foo = tokenize("0b101\n\"this is a string\"\nsomeToken\nbooBear\n123\n0x20\nyay");
-  CB_INFO("Tokenized");
 }
 
 std::vector<std::tuple<std::variant<int, std::string>, int, int>> Chipbit::Compiler::tokenize(const std::string &text) {
